@@ -1,0 +1,2129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SirenFirst — South India 108 Emergency Preemption</title>
+<meta name="description" content="Visual project brief: siren-first, vision-confirmed ambulance preemption for South Indian junctions, without pretrained models.">
+<style>
+  :root{
+    --paper:#f3efe5;
+    --paper-2:#fbf8f1;
+    --ink:#17242b;
+    --ink-soft:#465860;
+    --ink-faint:#6c7b81;
+    --line:#d9cfbd;
+    --line-strong:#b9ab93;
+    --teal:#0f6b62;
+    --teal-deep:#0a4c46;
+    --teal-soft:#dff0eb;
+    --amber:#a9660b;
+    --amber-deep:#7d4a06;
+    --amber-soft:#faeed6;
+    --blue:#2b5c9a;
+    --blue-deep:#1d4270;
+    --blue-soft:#e4edf8;
+    --red:#a93a35;
+    --red-deep:#7e2824;
+    --red-soft:#f7e3e0;
+    --purple:#66508f;
+    --purple-soft:#ede8f6;
+    --green:#2f6b46;
+    --green-soft:#e2f0e6;
+    --charcoal:#132027;
+    --radius:18px;
+    --shadow:0 1px 0 rgba(23,36,43,.04), 0 18px 34px -24px rgba(23,36,43,.35);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 85% -10%, rgba(15,107,98,.10), transparent 60%),
+      radial-gradient(900px 500px at 0% 20%, rgba(169,102,11,.08), transparent 55%),
+      var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+  a{color:var(--teal-deep);text-decoration-thickness:1px;text-underline-offset:3px}
+  a:hover{color:var(--amber-deep)}
+  .page{max-width:1320px;margin:0 auto;padding:22px 22px 60px}
+  .scroll-progress{position:fixed;top:0;left:0;right:0;height:4px;z-index:100;background:transparent}
+  .scroll-progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--amber),var(--red));transition:width .08s linear}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    overflow:hidden;
+    border-radius:26px;
+    background:
+      radial-gradient(700px 380px at 88% 0%, rgba(42,124,114,.55), transparent 62%),
+      radial-gradient(500px 320px at 4% 100%, rgba(169,102,11,.35), transparent 60%),
+      linear-gradient(145deg,#0f1c23 0%,#132a31 55%,#0e2026 100%);
+    color:#f6f2e8;
+    padding:clamp(26px,4.4vw,56px);
+    box-shadow:0 40px 80px -50px rgba(10,25,30,.9);
+  }
+  .hero::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+    background-size:44px 44px;
+    mask-image:linear-gradient(to bottom right,rgba(0,0,0,.8),transparent 75%);
+    pointer-events:none;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:0 0 0 60px rgba(255,255,255,.03),0 0 0 130px rgba(255,255,255,.02);
+    pointer-events:none;
+  }
+  .hero>*{position:relative;z-index:1}
+  .kicker{font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;color:#a9c9c3;font-weight:700}
+  .hero h1{
+    font-family:var(--serif);
+    font-weight:600;
+    font-size:clamp(3rem,7.5vw,5.4rem);
+    line-height:.92;
+    letter-spacing:-.025em;
+    margin:.28em 0 .18em;
+    color:#fbf7ec;
+  }
+  .hero h1 span{color:#e6b35c}
+  .hero .sub{max-width:760px;font-size:clamp(1.02rem,1.7vw,1.25rem);color:#d7e4df;line-height:1.55;margin:0 0 22px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 24px}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;
+    border:1px solid rgba(255,255,255,.22);
+    background:rgba(255,255,255,.07);
+    color:#eef4ef;border-radius:999px;padding:7px 12px;
+    font-size:.8rem;letter-spacing:.01em;white-space:nowrap;
+  }
+  .chip::before{content:"";width:6px;height:6px;border-radius:50%;background:#6cc3b4}
+  .chip.amber::before{background:#e6b35c}
+  .chip.red::before{background:#e1847c}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font:inherit;font-size:.9rem;font-weight:600;
+    border-radius:999px;padding:10px 16px;border:1px solid transparent;
+    cursor:pointer;text-decoration:none;transition:transform .12s ease,background .12s ease,border-color .12s ease;
+  }
+  .btn:hover{transform:translateY(-1px)}
+  .btn-primary{background:#f0c878;color:#2a1c06}
+  .btn-primary:hover{background:#f6d794;color:#2a1c06}
+  .btn-ghost{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.28);color:#f2f7f4}
+  .btn-ghost:hover{background:rgba(255,255,255,.12);color:#fff}
+  .btn-dark{background:var(--charcoal);color:#f7f3e9}
+  .btn-outline{background:transparent;border-color:var(--line-strong);color:var(--ink)}
+  .btn-outline:hover{background:#fff}
+  .status-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:26px}
+  .status{
+    border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.055);
+    border-radius:14px;padding:13px 15px;
+  }
+  .status b{display:block;font-size:.95rem;color:#f4f2e9;margin-bottom:2px}
+  .status small{color:#b9cdc8;font-size:.78rem;line-height:1.4;display:block}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+  .dot.green{background:#6fc08a;box-shadow:0 0 0 3px rgba(111,192,138,.18)}
+  .dot.amber{background:#e6b35c;box-shadow:0 0 0 3px rgba(230,179,92,.18)}
+  .dot.grey{background:#93a3a8;box-shadow:0 0 0 3px rgba(147,163,168,.16)}
+
+  /* ---------- layout ---------- */
+  .layout{display:grid;grid-template-columns:238px minmax(0,1fr);gap:44px;align-items:start;margin-top:38px}
+  .toc{position:sticky;top:22px;font-size:.86rem}
+  .toc .toc-title{font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-faint);font-weight:700;margin-bottom:10px}
+  .toc a{display:block;padding:5px 0 5px 12px;border-left:2px solid transparent;color:var(--ink-soft);text-decoration:none;line-height:1.35}
+  .toc a:hover{color:var(--ink)}
+  .toc a.active{border-left-color:var(--amber);color:var(--ink);font-weight:600;background:linear-gradient(90deg,rgba(169,102,11,.08),transparent)}
+  .toc .tiny{margin-top:18px;color:var(--ink-faint);font-size:.74rem;line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+  main{min-width:0}
+  .section{scroll-margin-top:24px;margin-bottom:68px}
+  .section-kicker{font-size:.72rem;letter-spacing:.19em;text-transform:uppercase;color:var(--amber-deep);font-weight:700;margin-bottom:7px}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.75rem,3.4vw,2.55rem);line-height:1.08;letter-spacing:-.015em;margin:0 0 12px}
+  h3{font-size:1.04rem;line-height:1.35;margin:0 0 6px}
+  .lede{font-size:1.06rem;color:var(--ink-soft);max-width:820px;margin:0 0 22px}
+  p{margin:0 0 12px}
+  .muted{color:var(--ink-soft)}
+  .small{font-size:.86rem}
+  .tiny{font-size:.76rem}
+  .mono{font-family:var(--mono);font-size:.86em}
+
+  /* ---------- generic cards ---------- */
+  .card{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}
+  .grid{display:grid;gap:16px}
+  .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .stat{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:18px;text-align:left}
+  .stat .num{font-family:var(--serif);font-size:2.1rem;line-height:1;color:var(--teal-deep);margin-bottom:4px}
+  .stat .lbl{font-size:.8rem;color:var(--ink-soft);line-height:1.4}
+  .callout{border-left:4px solid var(--amber);background:var(--amber-soft);border-radius:0 14px 14px 0;padding:16px 18px;margin:20px 0}
+  .callout.teal{border-left-color:var(--teal);background:var(--teal-soft)}
+  .callout.red{border-left-color:var(--red);background:var(--red-soft)}
+  .callout.purple{border-left-color:var(--purple);background:var(--purple-soft)}
+  .callout b{display:block;margin-bottom:3px}
+  .pill{display:inline-block;font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;font-weight:700;border-radius:999px;padding:3px 8px;background:#eee7d8;color:#5c503b;border:1px solid #ded2bd;white-space:nowrap}
+  .pill.teal{background:var(--teal-soft);color:var(--teal-deep);border-color:#b8dcd3}
+  .pill.amber{background:var(--amber-soft);color:var(--amber-deep);border-color:#e8d2a8}
+  .pill.red{background:var(--red-soft);color:var(--red-deep);border-color:#e6bdb8}
+  .pill.blue{background:var(--blue-soft);color:var(--blue-deep);border-color:#c0d3ea}
+  .pill.purple{background:var(--purple-soft);color:#4a3670;border-color:#cfc2e8}
+  .pill.green{background:var(--green-soft);color:#224f33;border-color:#bddcc7}
+  .quote{font-family:var(--serif);font-size:1.2rem;line-height:1.5;color:var(--ink);border-left:4px solid var(--teal);padding:6px 0 6px 18px;margin:18px 0}
+  .list-tight{margin:8px 0 0;padding-left:19px}
+  .list-tight li{margin:5px 0}
+  .list-clean{list-style:none;margin:8px 0 0;padding:0}
+  .list-clean li{position:relative;padding-left:18px;margin:6px 0}
+  .list-clean li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:50%;background:var(--teal)}
+  ul.yes,ul.no{list-style:none;margin:10px 0 0;padding:0}
+  ul.yes li,ul.no li{position:relative;padding-left:24px;margin:8px 0;font-size:.92rem}
+  ul.yes li::before,ul.no li::before{position:absolute;left:0;top:.1em;font-weight:800;font-size:.85rem;width:16px;height:16px;border-radius:50%;display:grid;place-items:center;line-height:1}
+  ul.yes li::before{content:"+";background:var(--green-soft);color:var(--green)}
+  ul.no li::before{content:"–";background:var(--red-soft);color:var(--red)}
+
+  /* ---------- compare ---------- */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .compare .card{padding:24px}
+  .compare .tagline{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+  .compare .usual .tagline{color:var(--red)}
+  .compare .ours .tagline{color:var(--teal)}
+  .compare h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;margin-bottom:12px}
+  .compare .usual{border-top:4px solid var(--red)}
+  .compare .ours{border-top:4px solid var(--teal)}
+
+  /* ---------- feasibility ---------- */
+  .feas{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:10px 20px;box-shadow:var(--shadow)}
+  .feas-row{display:grid;grid-template-columns:210px minmax(0,1fr) 58px;gap:14px;align-items:center;padding:13px 0;border-bottom:1px dashed var(--line)}
+  .feas-row:last-child{border-bottom:0}
+  .feas-row .name{font-weight:600;font-size:.92rem}
+  .feas-row .why{display:block;font-weight:400;font-size:.76rem;color:var(--ink-faint);line-height:1.4;margin-top:2px}
+  .bar{height:9px;border-radius:999px;background:#e8e1d3;overflow:hidden}
+  .bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),#3c9a8b)}
+  .bar.medium span{background:linear-gradient(90deg,var(--amber),#d29a3e)}
+  .bar.soft span{background:linear-gradient(90deg,var(--blue),#5a86bf)}
+  .feas-row .level{font-size:.72rem;font-weight:700;text-align:right;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em}
+  .verdict{margin-top:18px;border-radius:16px;background:var(--charcoal);color:#f6f2e8;padding:20px 22px}
+  .verdict b{color:#f0c878}
+
+  /* ---------- steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:step}
+  .step{position:relative;background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+  .step::before{
+    counter-increment:step;content:counter(step);
+    font-family:var(--serif);font-size:.95rem;font-weight:700;
+    display:grid;place-items:center;width:28px;height:28px;border-radius:50%;
+    background:var(--charcoal);color:#f0c878;margin-bottom:10px;
+  }
+  .step h3{font-size:.98rem}
+  .step p{font-size:.84rem;color:var(--ink-soft);margin:0}
+  .step .tag{position:absolute;right:14px;top:14px;font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+
+  /* ---------- figure ---------- */
+  figure{margin:0}
+  .figure{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);overflow:hidden}
+  .figure svg{display:block;width:100%;height:auto}
+  figcaption{font-size:.8rem;color:var(--ink-faint);line-height:1.45;padding:10px 4px 0}
+  .two-col{display:grid;grid-template-columns:1.05fr .95fr;gap:22px;align-items:start}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:10px;font-size:.75rem;color:var(--ink-soft)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .swatch{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  /* ---------- layers ---------- */
+  .layer{background:var(--paper-2);border:1px solid var(--line);border-left:6px solid var(--line-strong);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:16px}
+  .layer.audio{border-left-color:#d0a044}
+  .layer.vision{border-left-color:#3c9a8b}
+  .layer.geo{border-left-color:#5a86bf}
+  .layer.control{border-left-color:#c0665e}
+  .layer .layer-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .layer .layer-no{font-family:var(--serif);font-size:.9rem;font-weight:700;color:var(--ink-faint);letter-spacing:.08em}
+  .layer h3{font-family:var(--serif);font-size:1.3rem;font-weight:600;margin:0}
+  .layer .plain{font-size:.95rem;color:var(--ink-soft);margin:2px 0 10px}
+  .layer-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;margin-top:10px}
+  .layer-grid h4{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);margin:0 0 3px}
+  .layer-grid p{font-size:.85rem;margin:0;color:var(--ink-soft)}
+  .chips-inline{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips-inline .pill{font-size:.63rem}
+  details{border:1px solid var(--line);border-radius:10px;background:#f7f2e8;margin-top:12px;padding:0 14px}
+  details summary{cursor:pointer;font-weight:600;font-size:.84rem;padding:10px 0;color:var(--ink-soft);list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"+";display:inline-grid;place-items:center;width:16px;height:16px;margin-right:8px;border-radius:50%;background:#e7dfd0;color:var(--ink);font-weight:800;font-size:.72rem;vertical-align:1px}
+  details[open] summary::before{content:"–"}
+  details .detail-body{font-size:.84rem;color:var(--ink-soft);padding:0 0 12px;line-height:1.55}
+  details .detail-body code{font-family:var(--mono);font-size:.78rem;background:#efe8da;padding:1px 4px;border-radius:4px}
+
+  /* ---------- novelty ---------- */
+  .novel{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .novel .card{position:relative;padding-top:26px;border-top:4px solid var(--purple)}
+  .novel .no{font-family:var(--serif);font-size:2rem;line-height:1;color:var(--purple);margin-bottom:8px}
+  .novel h3{font-family:var(--serif);font-size:1.12rem;font-weight:600}
+  .novel p{font-size:.86rem;color:var(--ink-soft);margin:0}
+  .table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--paper-2)}
+  table{border-collapse:collapse;width:100%;font-size:.86rem}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f0e9dc;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);white-space:nowrap}
+  tr:last-child td{border-bottom:0}
+  td b{font-weight:600}
+  .table-compact td,.table-compact th{padding:9px 12px;font-size:.83rem}
+
+  /* ---------- datasets ---------- */
+  .ds-group{margin-top:26px}
+  .ds-group h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;margin:0 0 10px}
+  .ds-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .ds{background:var(--paper-2);border:1px solid var(--line);border-top:4px solid var(--line-strong);border-radius:14px;padding:17px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}
+  .ds.audio{border-top-color:#d0a044}
+  .ds.vision{border-top-color:#3c9a8b}
+  .ds.video{border-top-color:#5a86bf}
+  .ds.neg{border-top-color:#c0665e}
+  .ds .ds-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .ds h4{font-size:.95rem;margin:0;line-height:1.3}
+  .ds .meta{font-size:.75rem;color:var(--ink-faint);line-height:1.45}
+  .ds p{font-size:.82rem;color:var(--ink-soft);margin:0}
+  .ds .role{font-size:.75rem;margin-top:auto;padding-top:4px;color:var(--ink)}
+  .ds .role b{color:var(--teal-deep)}
+  .ds a{font-size:.75rem;word-break:break-all}
+
+  /* ---------- timeline ---------- */
+  .timeline{background:var(--paper-2);border:1px solid var(--line);border-radius:var(--radius);padding:8px 20px;box-shadow:var(--shadow)}
+  .tl-row{display:grid;grid-template-columns:88px minmax(0,1fr) 140px;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line);align-items:start}
+  .tl-row:last-child{border-bottom:0}
+  .tl-time{font-family:var(--mono);font-size:.8rem;color:var(--teal-deep);font-weight:700;padding-top:2px}
+  .tl-what{font-size:.9rem}
+  .tl-what b{display:block}
+  .tl-what span{font-size:.8rem;color:var(--ink-faint);line-height:1.4;display:block}
+  .tl-layer{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);text-align:right;padding-top:3px}
+
+  /* ---------- roadmap ---------- */
+  .road{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .phase{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:17px;box-shadow:var(--shadow)}
+  .phase .wk{font-family:var(--mono);font-size:.72rem;color:var(--amber-deep);font-weight:700;letter-spacing:.04em}
+  .phase h3{font-family:var(--serif);font-size:1.12rem;font-weight:600;margin:2px 0 6px}
+  .phase p{font-size:.82rem;color:var(--ink-soft);margin:0 0 8px}
+  .phase .gate{font-size:.75rem;border-top:1px solid var(--line);padding-top:8px;color:var(--ink)}
+  .phase .gate b{color:var(--teal-deep)}
+
+  /* ---------- metrics ---------- */
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .metric{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .metric .k{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:700}
+  .metric h3{font-family:var(--serif);font-size:1.18rem;font-weight:600;margin:3px 0 6px}
+  .metric p{font-size:.82rem;color:var(--ink-soft);margin:0}
+  .headline-metric{margin-top:16px;background:linear-gradient(135deg,#132a31,#0f4d47);color:#f4f1e7;border-radius:16px;padding:22px;font-size:1rem}
+  .headline-metric b{color:#f0c878}
+
+  /* ---------- Q&A form ---------- */
+  .toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:16px 0 22px}
+  .toolbar .save-state{font-size:.76rem;color:var(--ink-faint);margin-left:auto}
+  .q{background:var(--paper-2);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);margin-bottom:16px;break-inside:avoid}
+  .q-head{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+  .q-title{display:flex;gap:11px;align-items:flex-start}
+  .q-num{flex:0 0 auto;display:grid;place-items:center;width:29px;height:29px;border-radius:50%;background:var(--charcoal);color:#f0c878;font-family:var(--serif);font-weight:700;font-size:.92rem}
+  .q-text{font-weight:650;font-size:.98rem;line-height:1.4;margin:2px 0 0}
+  .q-status{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;font-weight:800;padding:3px 8px;border-radius:999px;background:#eee7d8;color:#6a5a3d;border:1px solid #dfd2bb;white-space:nowrap}
+  .q.answered .q-status{background:var(--green-soft);color:var(--green);border-color:#bcdcc6}
+  .q-why{font-size:.82rem;color:var(--ink-faint);margin:2px 0 12px}
+  .options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .option{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#faf6ed;cursor:pointer;transition:border-color .1s,background .1s}
+  .option:hover{border-color:var(--line-strong);background:#fffdf7}
+  .option.selected{border-color:var(--teal);background:var(--teal-soft);box-shadow:inset 0 0 0 1px rgba(15,107,98,.18)}
+  .option input{margin-top:.28em;accent-color:var(--teal);flex:0 0 auto}
+  .option span{font-size:.83rem;line-height:1.35}
+  .option small{display:block;color:var(--ink-faint);font-size:.74rem;line-height:1.35;margin-top:2px}
+  .rec{display:inline-block;font-size:.62rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--teal-deep);background:var(--teal-soft);border:1px solid #b8dcd3;border-radius:999px;padding:1px 6px;margin-left:4px;vertical-align:1px}
+  .q textarea,.q input[type=text]{
+    width:100%;margin-top:11px;border:1px solid var(--line);border-radius:10px;background:#fffdf7;
+    padding:9px 11px;font:inherit;font-size:.85rem;color:var(--ink);resize:vertical;min-height:64px;
+  }
+  .q textarea:focus,.q input:focus,.decision input:focus{outline:2px solid rgba(15,107,98,.28);outline-offset:1px;border-color:var(--teal)}
+  .decision-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .decision{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .decision label{display:block;font-size:.8rem;font-weight:650;margin-bottom:5px}
+  .decision input[type=text]{width:100%;border:1px solid var(--line);border-radius:9px;background:#fffdf7;padding:8px 10px;font:inherit;font-size:.84rem}
+  .decision .hint{font-size:.72rem;color:var(--ink-faint);margin-top:5px;line-height:1.4}
+  .radio-inline{display:flex;flex-wrap:wrap;gap:12px;font-size:.82rem;margin-top:2px}
+  .radio-inline label{display:inline-flex;align-items:center;gap:6px;font-weight:400;margin:0;cursor:pointer}
+  .radio-inline input{accent-color:var(--teal)}
+
+  /* ---------- glossary & footer ---------- */
+  .glossary{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .term{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .term b{display:block;font-size:.88rem;color:var(--teal-deep)}
+  .term span{font-size:.81rem;color:var(--ink-soft);line-height:1.45}
+  footer{border-top:1px solid var(--line);padding-top:22px;margin-top:20px;font-size:.78rem;color:var(--ink-faint);line-height:1.55}
+  footer a{color:var(--ink-soft)}
+
+  /* ---------- additions for brief sections ---------- */
+  .toc{max-height:calc(100vh - 44px);overflow:auto;padding-right:4px}
+  .role-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+  .role{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .role b{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-deep)}
+  .role span{font-size:.78rem;color:var(--ink-soft);line-height:1.45;display:block;margin-top:2px}
+  .dset-group{margin-top:30px}
+  .dset-group:first-of-type{margin-top:0}
+  .group-head{display:flex;gap:11px;align-items:flex-start;margin-bottom:10px}
+  .group-head .tag{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;border-radius:8px;background:var(--charcoal);color:#f0c878;font-size:.76rem;font-weight:800}
+  .group-head h3{font-family:var(--serif);font-weight:600}
+  .dset-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .dset{background:var(--paper-2);border:1px solid var(--line);border-top:4px solid var(--line-strong);border-radius:14px;padding:17px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:7px}
+  .dset-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .dset h4{font-size:.95rem;margin:0;line-height:1.3}
+  .dset-meta{font-size:.74rem;color:var(--ink-faint);line-height:1.45}
+  .dset p{font-size:.82rem;color:var(--ink-soft);margin:0}
+  .dset .src{font-size:.73rem;word-break:break-word;margin-top:auto;padding-top:3px}
+  .event-notes{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:16px}
+  .event-notes>div{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .event-notes b{display:block;font-size:.83rem;color:var(--teal-deep)}
+  .event-notes span{font-size:.8rem;color:var(--ink-soft);line-height:1.45}
+  .flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  .flow-step{background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:13px;box-shadow:var(--shadow)}
+  .flow-step .n{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--charcoal);color:#f0c878;font-family:var(--serif);font-size:.8rem;font-weight:700;margin-bottom:6px}
+  .flow-step b{display:block;font-size:.82rem;line-height:1.3;margin-bottom:3px}
+  .flow-step p{font-size:.75rem;color:var(--ink-soft);margin:0;line-height:1.45}
+  .metrics-table td:nth-child(3){white-space:nowrap}
+  .risk-table td:first-child{min-width:190px}
+  .bad-cell{color:var(--red-deep);font-weight:700;white-space:nowrap}
+  .warn-cell{color:var(--amber-deep);font-weight:700;white-space:nowrap}
+  .card.good{border-top:4px solid var(--green)}
+  .card.bad{border-top:4px solid var(--red)}
+  .card.good h3{color:var(--green)}
+  .card.bad h3{color:var(--red-deep)}
+  .qa-table td:nth-child(2){min-width:180px}
+  .qa-table td:nth-child(3){min-width:190px}
+  .form-note{background:var(--blue-soft);border:1px solid #c0d3ea;border-radius:12px;padding:12px 15px;font-size:.83rem;color:var(--ink-soft);margin-bottom:18px}
+  fieldset.q{border:0;background:var(--paper-2);box-shadow:0 0 0 1px var(--line),var(--shadow);padding:18px 20px;margin:0 0 16px;border-radius:16px;min-inline-size:0}
+  fieldset.q legend{width:100%;padding:0;margin:0 0 4px;font-weight:650;font-size:.98rem;line-height:1.4}
+  .qno{display:inline-grid;place-items:center;min-width:32px;height:26px;padding:0 7px;margin-right:8px;border-radius:999px;background:var(--charcoal);color:#f0c878;font-family:var(--serif);font-size:.8rem;font-weight:700;vertical-align:1px}
+  .qhelp{font-size:.81rem;color:var(--ink-faint);margin:2px 0 11px}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .opts label{display:flex;gap:9px;align-items:flex-start;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#faf6ed;cursor:pointer;transition:border-color .1s,background .1s}
+  .opts label:hover{border-color:var(--line-strong);background:#fffdf7}
+  .opts label.selected,.opts label:has(input:checked){border-color:var(--teal);background:var(--teal-soft);box-shadow:inset 0 0 0 1px rgba(15,107,98,.18)}
+  .opts input{margin-top:.28em;accent-color:var(--teal);flex:0 0 auto}
+  .opts span{font-size:.83rem;line-height:1.35}
+  .opts small{display:block;color:var(--ink-faint);font-size:.74rem;line-height:1.35;margin-top:2px}
+  .qnote{width:100%;min-height:76px;margin-top:8px;border:1px solid var(--line);border-radius:10px;background:#fffdf7;padding:9px 11px;font:inherit;font-size:.85rem;line-height:1.5;color:var(--ink);resize:vertical}
+  .qnote:focus{outline:2px solid rgba(15,107,98,.28);outline-offset:1px;border-color:var(--teal)}
+  .decisions{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{display:block;background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+  .field>span{display:block;font-size:.79rem;font-weight:650;margin-bottom:6px}
+  .field select,.field input{width:100%;border:1px solid var(--line);border-radius:9px;background:#fffdf7;padding:8px 10px;font:inherit;font-size:.84rem;color:var(--ink)}
+  .field select:focus,.field input:focus{outline:2px solid rgba(15,107,98,.28);outline-offset:1px;border-color:var(--teal)}
+  .form-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin-top:20px}
+  .btn-danger{background:var(--red-soft);border-color:#e6bdb8;color:var(--red-deep)}
+  .btn-danger:hover{background:#f3d5d1}
+  .saved{font-size:.76rem;color:var(--ink-faint);margin-left:auto}
+  .save-status:not(:empty){color:var(--teal-deep);font-weight:600}
+  .export-fallback{margin-top:10px;background:var(--paper-2);border:1px solid var(--line);border-radius:12px;padding:12px 15px}
+  .export-fallback summary{cursor:pointer;font-size:.82rem;font-weight:650;color:var(--teal-deep)}
+  .export-fallback[open] summary{margin-bottom:8px}
+  .export-help{font-size:.78rem;color:var(--ink-faint);margin:0 0 8px;line-height:1.5}
+  .export-text{width:100%;min-height:220px;border:1px solid var(--line);border-radius:9px;background:#fffdf7;padding:10px 12px;font-family:var(--mono);font-size:.75rem;line-height:1.45;color:var(--ink);resize:vertical}
+  .export-copy{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+  .glossary .term{break-inside:avoid}
+  .res-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .res-card{background:var(--paper-2);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .res-card h3{display:flex;gap:9px;align-items:center;font-family:var(--serif);font-size:1.12rem;font-weight:600;margin:0 0 8px}
+  .res-badge{display:inline-grid;place-items:center;width:24px;height:24px;flex:0 0 auto;border-radius:7px;background:var(--charcoal);color:#f0c878;font-family:var(--sans);font-size:.7rem;font-weight:800}
+  .res-list{list-style:none;margin:0;padding:0}
+  .res-list li{padding:9px 0;border-top:1px dashed var(--line)}
+  .res-list li:first-child{border-top:0;padding-top:0}
+  .res-list a,.res-list .res-plain{display:block;font-weight:650;font-size:.83rem;line-height:1.35;color:var(--teal-deep)}
+  .res-list .res-plain{color:var(--ink)}
+  .res-list span{display:block;color:var(--ink-faint);font-size:.75rem;line-height:1.45;margin-top:2px}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1060px){
+    .layout{grid-template-columns:1fr;gap:24px}
+    .toc{position:static;display:none}
+    .g4,.steps{grid-template-columns:repeat(2,1fr)}
+    .g3,.novel,.metrics,.road{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width:760px){
+    .page{padding:14px 12px 40px}
+    .hero{border-radius:18px}
+    .status-grid,.steps,.g2,.g3,.g4,.novel,.metrics,.road,.ds-grid,.compare,.two-col,.layer-grid,.options,.decision-grid,.glossary{grid-template-columns:1fr}
+    .feas-row{grid-template-columns:1fr;gap:6px}
+    .feas-row .level{text-align:left}
+    .tl-row{grid-template-columns:70px minmax(0,1fr);gap:10px}
+    .tl-layer{grid-column:2;text-align:left;padding-top:0}
+    .q-head{flex-direction:column;gap:6px}
+    .toolbar .save-state{margin-left:0;width:100%}
+  }
+
+  @media (max-width:1060px){
+    .role-grid{grid-template-columns:repeat(2,1fr)}
+    .flow{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (max-width:760px){
+    .role-grid,.flow,.res-grid,.dset-grid,.event-notes,.decisions,.opts{grid-template-columns:1fr}
+    .dset-top{flex-direction:column;gap:4px}
+    .saved{margin-left:0;width:100%}
+  }
+
+  /* ---------- print ---------- */
+  @media print{
+    @page{margin:14mm}
+    body{background:#fff;color:#000;font-size:10.5pt}
+    .page{max-width:none;padding:0}
+    .scroll-progress,.toc,.hero-actions,.toolbar,.no-print{display:none !important}
+    .hero{background:#fff;color:#000;border:1px solid #333;box-shadow:none;border-radius:0;padding:18px}
+    .hero h1{color:#000}
+    .hero h1 span{color:#000}
+    .hero .sub,.status small,.kicker{color:#222}
+    .chip{border-color:#777;background:#fff;color:#000}
+    .status{border-color:#aaa}
+    .layout{display:block}
+    .section{margin-bottom:26px}
+    .card,.q,.ds,.phase,.metric,.layer,.feas,.timeline,.table-wrap{box-shadow:none;break-inside:avoid}
+    .q{page-break-inside:avoid}
+    .qnote{border-color:#999;background:#fff;color:#000;overflow:visible}
+    a{color:#000;text-decoration:underline}
+    details{border:1px solid #bbb}
+    .headline-metric,.verdict{background:#fff;color:#000;border:1px solid #333}
+    .headline-metric b,.verdict b{color:#000}
+    .figure svg{max-height:120mm}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{transition:none !important;animation:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="scroll-progress no-print" aria-hidden="true"><span id="progressBar"></span></div>
+
+<div class="page">
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <div class="kicker">B.Tech final-year project · planning brief v1 · 23 October 2026</div>
+    <h1>Siren<span>First</span></h1>
+    <p class="sub">Hear the siren early. Confirm with evidence. Clear the right arm of the junction. Not a single pretrained weight.</p>
+    <div class="chips" aria-label="Project attributes">
+      <span class="chip amber">South India · 108 first</span>
+      <span class="chip">No pretrained models</span>
+      <span class="chip">Audio + video</span>
+      <span class="chip">Software-only prototype</span>
+      <span class="chip red">12 weeks · solo</span>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#minute">Read the one-minute version</a>
+      <a class="btn btn-ghost" href="#questions">Round 2 questions</a>
+      <button class="btn btn-ghost" type="button" onclick="window.print()">Print / save PDF</button>
+    </div>
+    <div class="status-grid" aria-label="Project status">
+      <div class="status">
+        <b><span class="dot green"></span>Round 1: answered</b>
+        <small>11 professor questions answered. All compatible with this design.</small>
+      </div>
+      <div class="status">
+        <b><span class="dot amber"></span>Round 2: to ask</b>
+        <small>Novelty framing, benchmark size, metrics and scope need sign-off.</small>
+      </div>
+      <div class="status">
+        <b><span class="dot grey"></span>Build: not started</b>
+        <small>Implementation starts after the Round 2 answers are recorded.</small>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- ================= TOC ================= -->
+    <aside class="toc no-print" aria-label="Contents">
+      <div class="toc-title">Contents</div>
+      <a href="#minute">1. One-minute version</a>
+      <a href="#why">2. Why not YOLO</a>
+      <a href="#feasible">3. Can we build it?</a>
+      <a href="#problem">4. The problem</a>
+      <a href="#idea">5. The idea in one picture</a>
+      <a href="#layers">6. The four layers</a>
+      <a href="#novelty">7. Novel contribution</a>
+      <a href="#datasets">8. Datasets</a>
+      <a href="#resources">9. Resources we will use</a>
+      <a href="#event">10. One event, second by second</a>
+      <a href="#achieve">11. How we achieve it</a>
+      <a href="#metrics">12. How success is measured</a>
+      <a href="#show">13. What we show / don't claim</a>
+      <a href="#risks">14. Risks</a>
+      <a href="#round1">15. Round 1 answers</a>
+      <a href="#questions">16. Round 2 questions</a>
+      <a href="#decisions">17. Your decisions</a>
+      <a href="#howto">18. How to use this page</a>
+      <a href="#glossary">19. Glossary</a>
+      <div class="tiny">
+        Planning document. No accuracy claims yet. Dataset links open externally; this page works offline.
+      </div>
+    </aside>
+
+    <main>
+
+      <!-- ================= 1. ONE MINUTE ================= -->
+      <section class="section" id="minute">
+        <div class="section-kicker">01 · The short version</div>
+        <h2>What the project actually does</h2>
+        <p class="lede">An ambulance is approaching a junction. The camera cannot see it clearly yet, but the audio can already hear the siren. SirenFirst raises a tentative alert, confirms the vehicle as it gets closer, works out which arm of the junction it is using, and then switches a simulated signal safely.</p>
+
+        <div class="steps">
+          <div class="step">
+            <span class="tag">Layer 1</span>
+            <h3>Hear</h3>
+            <p>Extract the audio track. Detect the siren's sweep pattern even when the ambulance is far away or hidden behind traffic.</p>
+          </div>
+          <div class="step">
+            <span class="tag">Layer 2</span>
+            <h3>See</h3>
+            <p>Track moving vehicles and check for ambulance evidence: flashing red/blue beacon, white or yellow body, red cross, 108 markings.</p>
+          </div>
+          <div class="step">
+            <span class="tag">Layer 3</span>
+            <h3>Locate</h3>
+            <p>Map the road to a bird's-eye view. Which arm is it approaching from? How many seconds until the stop line?</p>
+          </div>
+          <div class="step">
+            <span class="tag">Layer 4</span>
+            <h3>Act</h3>
+            <p>A safety-checked state machine clears conflicting traffic and gives green to the ambulance's arm.</p>
+          </div>
+        </div>
+
+        <div class="callout red">
+          <b>The one rule that keeps it safe</b>
+          Sound can <i>alert</i>. Only sight plus geometry can <i>switch the signal</i>. A siren alone never gets a green light.
+        </div>
+
+        <div class="grid g4" style="margin-top:18px">
+          <div class="stat"><div class="num">4</div><div class="lbl">sensing and decision layers</div></div>
+          <div class="stat"><div class="num">2</div><div class="lbl">independent evidence paths: audio and vision</div></div>
+          <div class="stat"><div class="num">3</div><div class="lbl">novel claims to defend in the viva</div></div>
+          <div class="stat"><div class="num">0</div><div class="lbl">pretrained weights used anywhere</div></div>
+        </div>
+      </section>
+
+      <!-- ================= 2. WHY NOT YOLO ================= -->
+      <section class="section" id="why">
+        <div class="section-kicker">02 · The constraint</div>
+        <h2>Why this is not a YOLO project</h2>
+        <p class="lede">The professor's rule is “no frontier models like YOLO”, clarified to mean <b>no pretrained weights</b>. Training from scratch is allowed. That single rule changes the project from “fine-tune a detector” into “build and defend a system”.</p>
+
+        <div class="compare">
+          <div class="card usual">
+            <div class="tagline">The usual final-year version</div>
+            <h3>Download. Fine-tune. Draw boxes.</h3>
+            <ul class="no">
+              <li>Fine-tune YOLO on a small ambulance dataset.</li>
+              <li>Report mAP and a few screenshots.</li>
+              <li>One black box decides everything.</li>
+              <li>Banned by the professor's constraint.</li>
+              <li>No story for “without lag”, lanes, or signal safety.</li>
+            </ul>
+          </div>
+          <div class="card ours">
+            <div class="tagline">SirenFirst</div>
+            <h3>Build the evidence, then the decision.</h3>
+            <ul class="yes">
+              <li>Handcrafted and learned cues, trained from zero.</li>
+              <li>Every stage is explainable in the viva.</li>
+              <li>Audio provides early warning; vision and geometry confirm.</li>
+              <li>Arm-level preemption with safety constraints.</li>
+              <li>Benchmark, ablations, and a lead-time vs false-alarm curve.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout">
+          <b>Honest note</b>
+          YOLO is excellent. This is not an anti-YOLO argument. It is simply excluded here, so the project's value has to come from the system design, the fusion policy, and the evaluation — which is a better final-year story anyway.
+        </div>
+      </section>
+      <!-- ================= 3. FEASIBILITY ================= -->
+      <section class="section" id="feasible">
+        <div class="section-kicker">03 · Feasibility</div>
+        <h2>Can we actually build it?</h2>
+        <p class="lede">Yes — with one honest condition: visual detection must be a <b>confirmer</b>, not the trigger. The audio branch carries the early-warning load; vision and geometry decide whether action is safe. This is exactly how the system is designed.</p>
+
+        <div class="feas">
+          <div class="feas-row">
+            <div class="name">Audio siren detection<span class="why">Public training data is strong; classical models are well understood.</span></div>
+            <div class="bar"><span style="width:86%"></span></div>
+            <div class="level">High</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">Visual confirmation<span class="why">No pretrained weights and limited Indian images, but beacon/livery cues and synthetic data help.</span></div>
+            <div class="bar medium"><span style="width:63%"></span></div>
+            <div class="level">Medium</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">Tracking and geometry<span class="why">Fixed camera, classical CV, one-time calibration.</span></div>
+            <div class="bar"><span style="width:86%"></span></div>
+            <div class="level">High</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">Fusion policy<span class="why">The novel part; needs careful validation but the logic is simple and testable.</span></div>
+            <div class="bar medium"><span style="width:72%"></span></div>
+            <div class="level">Med-high</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">Signal controller<span class="why">Software state machine with explicit safety rules.</span></div>
+            <div class="bar"><span style="width:94%"></span></div>
+            <div class="level">High</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">End-to-end demo<span class="why">Guaranteed via disclosed synthetic composites; real clips add authenticity.</span></div>
+            <div class="bar soft"><span style="width:76%"></span></div>
+            <div class="level">Med-high</div>
+          </div>
+          <div class="feas-row">
+            <div class="name">Novelty and viva<span class="why">The design is explainable and the benchmark fills a real gap.</span></div>
+            <div class="bar"><span style="width:85%"></span></div>
+            <div class="level">High</div>
+          </div>
+        </div>
+
+        <div class="verdict">
+          <b>Verdict:</b> buildable as a working software prototype. The risky part is visual generalisation, not the idea. We reduce that risk by keeping vision as a gate, leaning on beacon/livery cues, using synthetic training data, and reporting real and synthetic results separately.
+        </div>
+
+        <div class="callout teal" style="margin-top:18px">
+          <b>What this project will not promise</b>
+          State-of-the-art detection accuracy, all-weather robustness, real traffic-signal hardware, or direction-of-arrival from a single microphone. Those are future work and will be stated as limitations.
+        </div>
+      </section>
+
+      <!-- ================= 4. PROBLEM ================= -->
+      <section class="section" id="problem">
+        <div class="section-kicker">04 · The problem</div>
+        <h2>Why Indian junctions need a different design</h2>
+        <blockquote class="quote">“Detect an ambulance from a video and let that lane pass automatically, without any lag.” — the given problem statement</blockquote>
+
+        <div class="grid g2">
+          <div class="card">
+            <h3>Lanes are a suggestion, not a rule</h3>
+            <p class="small muted">Indian junctions often have no usable lane markings, and ambulances weave through gaps. A design that depends on painted lanes will fail. SirenFirst preempts the <b>approach arm</b> (north, east, south, west) and a free corridor instead.</p>
+          </div>
+          <div class="card">
+            <h3>Sirens travel farther than pixels</h3>
+            <p class="small muted">A siren is audible from roughly 100–300 m; a camera may only recognise the vehicle at a fraction of that distance. That gap is the entire “without lag” opportunity.</p>
+          </div>
+          <div class="card">
+            <h3>Every second matters</h3>
+            <p class="small muted">The useful metric is not “did we detect it eventually?” but “how many seconds before the stop line did we confirm it, at an acceptable false-alarm rate?”</p>
+          </div>
+          <div class="card">
+            <h3>GPS geofencing exists, but needs hardware</h3>
+            <p class="small muted">Bengaluru traffic police geofenced about 80 GPS-equipped ambulances to auto-green 10 junctions (2024). SirenFirst is camera-and-audio only: no fleet instrumentation.</p>
+          </div>
+        </div>
+
+        <div class="callout purple">
+          <b>The reframe</b>
+          We are not building “an ambulance detector”. We are building an <b>explainable, multi-cue emergency preemption system</b> with a measurable lead-time advantage. That is what the professor can grade as novel.
+        </div>
+      </section>
+      <!-- ================= 5. IDEA ================= -->
+      <section class="section" id="idea">
+        <div class="section-kicker">05 · The architecture</div>
+        <h2>The idea in one picture</h2>
+        <p class="lede">Two independent evidence paths feed one cautious decision. Audio supplies early warning; vision supplies identity; geometry supplies location and time. The fusion gate decides whether the controller is allowed to act.</p>
+
+        <figure class="figure">
+          <svg viewBox="0 0 1120 650" role="img" aria-labelledby="pipeTitle pipeDesc">
+            <title id="pipeTitle">SirenFirst pipeline</title>
+            <desc id="pipeDesc">Audio and video enter separate branches. Audio produces a tentative alert. Video produces tracked vehicle cues and a bird's-eye arm and ETA estimate. A fusion gate combines them into a confirmed decision, which drives a safety-constrained signal controller and an annotated output.</desc>
+            <defs>
+              <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#72858c"></path>
+              </marker>
+              <marker id="arP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#66508f"></path>
+              </marker>
+              <marker id="arR" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M0,0 L10,5 L0,10 z" fill="#a93a35"></path>
+              </marker>
+            </defs>
+
+            <rect x="0" y="10" width="1120" height="124" rx="16" fill="#fcf5e5"></rect>
+            <rect x="0" y="146" width="1120" height="124" rx="16" fill="#e9f4f1"></rect>
+            <rect x="0" y="282" width="1120" height="124" rx="16" fill="#e9f0f9"></rect>
+            <rect x="0" y="418" width="1120" height="124" rx="16" fill="#f7eae7"></rect>
+
+            <text x="18" y="32" font-family="system-ui,sans-serif" font-size="11" letter-spacing="2.4" font-weight="700" fill="#9a7a30">1 · HEAR</text>
+            <text x="18" y="168" font-family="system-ui,sans-serif" font-size="11" letter-spacing="2.4" font-weight="700" fill="#3d7f73">2 · SEE</text>
+            <text x="18" y="304" font-family="system-ui,sans-serif" font-size="11" letter-spacing="2.4" font-weight="700" fill="#3c6799">3 · LOCATE</text>
+            <text x="18" y="440" font-family="system-ui,sans-serif" font-size="11" letter-spacing="2.4" font-weight="700" fill="#9b4a43">4 · ACT</text>
+
+            <g font-family="system-ui,sans-serif">
+              <rect x="120" y="34" width="168" height="82" rx="12" fill="#fff9ee" stroke="#d9b56b"></rect>
+              <text x="204" y="66" text-anchor="middle" font-size="14" font-weight="700" fill="#4a3715">Audio track</text>
+              <text x="204" y="86" text-anchor="middle" font-size="11.5" fill="#7a653f">from the video</text>
+
+              <rect x="318" y="34" width="172" height="82" rx="12" fill="#fff9ee" stroke="#d9b56b"></rect>
+              <text x="404" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#4a3715">Features</text>
+              <text x="404" y="80" text-anchor="middle" font-size="11.5" fill="#7a653f">log-mel · MFCC · flux</text>
+              <text x="404" y="97" text-anchor="middle" font-size="11.5" fill="#7a653f">siren F0 sweep</text>
+
+              <rect x="520" y="34" width="186" height="82" rx="12" fill="#fff9ee" stroke="#d9b56b"></rect>
+              <text x="613" y="62" text-anchor="middle" font-size="14" font-weight="700" fill="#4a3715">Siren model</text>
+              <text x="613" y="80" text-anchor="middle" font-size="11.5" fill="#7a653f">GMM / SVM, from scratch</text>
+              <text x="613" y="97" text-anchor="middle" font-size="11.5" fill="#7a653f">optional tiny CNN</text>
+
+              <rect x="736" y="34" width="150" height="82" rx="12" fill="#f9e7c6" stroke="#c99a42"></rect>
+              <text x="811" y="66" text-anchor="middle" font-size="14" font-weight="700" fill="#5c3d08">Tentative alert</text>
+              <text x="811" y="86" text-anchor="middle" font-size="11.5" fill="#7a653f">p(siren) + onset</text>
+            </g>
+
+            <g font-family="system-ui,sans-serif">
+              <rect x="120" y="170" width="168" height="82" rx="12" fill="#f2faf7" stroke="#8dbfb4"></rect>
+              <text x="204" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1c4f47">Video frames</text>
+              <text x="204" y="222" text-anchor="middle" font-size="11.5" fill="#467a71">fixed camera</text>
+
+              <rect x="318" y="170" width="172" height="82" rx="12" fill="#f2faf7" stroke="#8dbfb4"></rect>
+              <text x="404" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1c4f47">Motion + tracking</text>
+              <text x="404" y="222" text-anchor="middle" font-size="11.5" fill="#467a71">MOG2 · Kalman</text>
+
+              <rect x="520" y="170" width="186" height="82" rx="12" fill="#f2faf7" stroke="#8dbfb4"></rect>
+              <text x="613" y="196" text-anchor="middle" font-size="14" font-weight="700" fill="#1c4f47">Ambulance cues</text>
+              <text x="613" y="215" text-anchor="middle" font-size="11.5" fill="#467a71">beacon · livery · 108</text>
+              <text x="613" y="232" text-anchor="middle" font-size="11.5" fill="#467a71">red cross · shape</text>
+
+              <rect x="736" y="170" width="150" height="82" rx="12" fill="#dff0eb" stroke="#6ba99d"></rect>
+              <text x="811" y="202" text-anchor="middle" font-size="14" font-weight="700" fill="#1c4f47">Visual score</text>
+              <text x="811" y="222" text-anchor="middle" font-size="11.5" fill="#467a71">HOG + SVM</text>
+            </g>
+
+            <g font-family="system-ui,sans-serif">
+              <rect x="120" y="306" width="168" height="82" rx="12" fill="#eef4fb" stroke="#9bb6d6"></rect>
+              <text x="204" y="338" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3f66">Calibration</text>
+              <text x="204" y="358" text-anchor="middle" font-size="11.5" fill="#4c6d94">4-point homography</text>
+
+              <rect x="318" y="306" width="172" height="82" rx="12" fill="#eef4fb" stroke="#9bb6d6"></rect>
+              <text x="404" y="338" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3f66">Bird's-eye view</text>
+              <text x="404" y="358" text-anchor="middle" font-size="11.5" fill="#4c6d94">world coordinates</text>
+
+              <rect x="520" y="306" width="186" height="82" rx="12" fill="#dce8f7" stroke="#7fa2cd"></rect>
+              <text x="613" y="332" text-anchor="middle" font-size="14" font-weight="700" fill="#1f3f66">Approach arm + ETA</text>
+              <text x="613" y="351" text-anchor="middle" font-size="11.5" fill="#4c6d94">N / E / S / W</text>
+              <text x="613" y="368" text-anchor="middle" font-size="11.5" fill="#4c6d94">seconds to stop line</text>
+            </g>
+
+            <rect x="920" y="34" width="184" height="372" rx="14" fill="#f0ebf8" stroke="#a895c9"></rect>
+            <text x="1012" y="62" text-anchor="middle" font-family="system-ui,sans-serif" font-size="15" font-weight="700" fill="#4a3670">Fusion gate</text>
+            <text x="1012" y="82" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" fill="#6a588c">tentative → confirmed</text>
+            <line x1="940" y1="96" x2="1084" y2="96" stroke="#c9bce2" stroke-width="1"></line>
+            <text x="1012" y="121" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" fill="#5a4a7d">Audio may alert.</text>
+            <text x="1012" y="139" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" fill="#5a4a7d">Vision + geometry</text>
+            <text x="1012" y="157" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" fill="#5a4a7d">must confirm.</text>
+            <rect x="944" y="178" width="136" height="52" rx="9" fill="#fff" stroke="#c9bce2"></rect>
+            <text x="1012" y="199" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#4a3670">score + hysteresis</text>
+            <text x="1012" y="217" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.5" fill="#6a588c">N-of-M consistency</text>
+            <rect x="944" y="240" width="136" height="52" rx="9" fill="#fff" stroke="#c9bce2"></rect>
+            <text x="1012" y="261" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11.5" font-weight="700" fill="#4a3670">track association</text>
+            <text x="1012" y="279" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.5" fill="#6a588c">sound ↔ vehicle</text>
+            <text x="1012" y="325" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#5a4a7d">A siren alone</text>
+            <text x="1012" y="342" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#5a4a7d">cannot act.</text>
+
+            <rect x="920" y="440" width="184" height="82" rx="12" fill="#f9e7e4" stroke="#cf9d96"></rect>
+            <text x="1012" y="470" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#6d2b27">Signal FSM</text>
+            <text x="1012" y="489" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.8" fill="#8c5651">min green · yellow · all-red</text>
+            <text x="1012" y="505" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.8" fill="#8c5651">conflict lock · abort</text>
+
+            <rect x="640" y="556" width="464" height="74" rx="12" fill="#17242b"></rect>
+            <text x="872" y="586" text-anchor="middle" font-family="system-ui,sans-serif" font-size="14" font-weight="700" fill="#f4efe2">Annotated video · event log · metrics</text>
+            <text x="872" y="607" text-anchor="middle" font-family="system-ui,sans-serif" font-size="11" fill="#b9c7c4">boxes · arm · ETA · signal state · decisions</text>
+
+            <line x1="288" y1="75" x2="312" y2="75" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+            <line x1="490" y1="75" x2="514" y2="75" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+            <line x1="706" y1="75" x2="730" y2="75" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+
+            <line x1="288" y1="211" x2="312" y2="211" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+            <line x1="490" y1="211" x2="514" y2="211" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+            <line x1="706" y1="211" x2="730" y2="211" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+
+            <line x1="288" y1="347" x2="312" y2="347" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+            <line x1="490" y1="347" x2="514" y2="347" stroke="#72858c" stroke-width="1.6" marker-end="url(#ar)"></line>
+
+            <line x1="886" y1="75" x2="914" y2="90" stroke="#66508f" stroke-width="1.8" marker-end="url(#arP)"></line>
+            <line x1="886" y1="211" x2="914" y2="211" stroke="#66508f" stroke-width="1.8" marker-end="url(#arP)"></line>
+            <line x1="706" y1="347" x2="914" y2="300" stroke="#66508f" stroke-width="1.8" marker-end="url(#arP)"></line>
+
+            <line x1="404" y1="252" x2="404" y2="300" stroke="#5a86bf" stroke-width="1.4" stroke-dasharray="5 4" marker-end="url(#ar)"></line>
+            <text x="414" y="281" font-family="system-ui,sans-serif" font-size="10.5" fill="#4c6d94">tracks</text>
+
+            <line x1="1012" y1="406" x2="1012" y2="434" stroke="#a93a35" stroke-width="1.8" marker-end="url(#arR)"></line>
+            <line x1="1012" y1="522" x2="1012" y2="550" stroke="#a93a35" stroke-width="1.8" marker-end="url(#arR)"></line>
+            <line x1="920" y1="481" x2="892" y2="520" stroke="#a93a35" stroke-width="1.4" marker-end="url(#arR)"></line>
+          </svg>
+          <figcaption>Read it like a sentence: <b>hear</b> the siren → <b>see</b> the vehicle → <b>locate</b> the arm and ETA → <b>act</b> only after confirmation. Purple arrows carry evidence into the fusion gate; the red path is the only path allowed to change a signal.</figcaption>
+        </figure>
+
+        <div class="legend" aria-label="Legend">
+          <span><i class="swatch" style="background:#d0a044"></i>Audio evidence</span>
+          <span><i class="swatch" style="background:#3c9a8b"></i>Visual evidence</span>
+          <span><i class="swatch" style="background:#5a86bf"></i>Geometry</span>
+          <span><i class="swatch" style="background:#66508f"></i>Fusion gate</span>
+          <span><i class="swatch" style="background:#a93a35"></i>Action path</span>
+        </div>
+
+        <div class="two-col" style="margin-top:26px">
+          <div>
+            <h3 style="font-family:var(--serif);font-size:1.3rem;margin-bottom:8px">Why the unit is an “arm”, not a lane</h3>
+            <p class="muted small">In dense Indian traffic, lane markings are often absent or ignored, and an ambulance may approach on the wrong side or through a gap. Asking “which painted lane?” is the wrong question. SirenFirst asks: <b>which arm of the junction is this track entering from, and when will it cross the stop line?</b></p>
+            <p class="muted small">That gives a robust, India-specific formulation: preempt one approach arm, hold the conflicting arms, and reopen the corridor. The bird's-eye view makes the reasoning visible in the demo.</p>
+            <div class="chips-inline">
+              <span class="pill blue">fixed camera</span>
+              <span class="pill blue">4-point calibration</span>
+              <span class="pill blue">metres, not pixels</span>
+              <span class="pill blue">approach direction</span>
+            </div>
+          </div>
+          <figure class="figure">
+            <svg viewBox="0 0 520 410" role="img" aria-labelledby="juncTitle juncDesc">
+              <title id="juncTitle">Arm-level junction preemption</title>
+              <desc id="juncDesc">Top-down view of a four-arm junction. The south approach arm is highlighted with an ambulance approaching the stop line; the other arms are held at red.</desc>
+              <rect x="0" y="0" width="520" height="410" rx="14" fill="#f8f4ea"></rect>
+              <rect x="196" y="0" width="128" height="410" fill="#d9d2c4"></rect>
+              <rect x="0" y="150" width="520" height="118" fill="#d9d2c4"></rect>
+              <rect x="196" y="150" width="128" height="118" fill="#cfc6b5"></rect>
+              <line x1="260" y1="0" x2="260" y2="150" stroke="#f8f4ea" stroke-width="2" stroke-dasharray="9 8"></line>
+              <line x1="260" y1="268" x2="260" y2="410" stroke="#f8f4ea" stroke-width="2" stroke-dasharray="9 8"></line>
+              <line x1="0" y1="209" x2="196" y2="209" stroke="#f8f4ea" stroke-width="2" stroke-dasharray="9 8"></line>
+              <line x1="324" y1="209" x2="520" y2="209" stroke="#f8f4ea" stroke-width="2" stroke-dasharray="9 8"></line>
+
+              <rect x="204" y="270" width="112" height="140" rx="8" fill="#6fc08a" opacity="0.20"></rect>
+              <path d="M260 380 L260 292" stroke="#2f6b46" stroke-width="7" stroke-linecap="round"></path>
+              <path d="M246 306 L260 288 L274 306" fill="none" stroke="#2f6b46" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"></path>
+
+              <rect x="242" y="326" width="36" height="56" rx="6" fill="#fffdf8" stroke="#2f6b46" stroke-width="2"></rect>
+              <rect x="242" y="344" width="36" height="10" fill="#c0392b"></rect>
+              <rect x="248" y="314" width="24" height="8" rx="3" fill="#2b6cb0"></rect>
+              <circle cx="253" cy="316" r="2.4" fill="#e74c3c"></circle>
+              <circle cx="267" cy="316" r="2.4" fill="#e74c3c"></circle>
+
+              <line x1="204" y1="280" x2="316" y2="280" stroke="#fffdf8" stroke-width="5"></line>
+
+              <text x="260" y="28" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#7d6a4c">NORTH</text>
+              <text x="260" y="398" text-anchor="middle" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#2f6b46">SOUTH · PREEMPTED</text>
+              <text x="20" y="214" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#7d6a4c">WEST</text>
+              <text x="500" y="214" text-anchor="end" font-family="system-ui,sans-serif" font-size="12" font-weight="700" fill="#7d6a4c">EAST</text>
+
+              <g font-family="system-ui,sans-serif" font-size="10" fill="#3d4a4f">
+                <rect x="330" y="300" width="170" height="96" rx="10" fill="#fffdf8" stroke="#d9cfbd"></rect>
+                <text x="344" y="319" font-weight="700" fill="#17242b">Preempted corridor</text>
+                <circle cx="348" cy="334" r="5" fill="#6fc08a"></circle>
+                <text x="360" y="338">ambulance arm</text>
+                <circle cx="348" cy="352" r="5" fill="#cfc6b5"></circle>
+                <text x="360" y="356">stop line</text>
+                <circle cx="348" cy="370" r="5" fill="#c0392b"></circle>
+                <text x="360" y="374">conflicting arms held</text>
+                <text x="344" y="390" fill="#6c7b81" font-size="9.5">Arm, not painted lane.</text>
+              </g>
+            </svg>
+            <figcaption>Arm-level preemption: the south approach gets a green corridor while conflicting arms are held, regardless of painted lane markings.</figcaption>
+          </figure>
+        </div>
+      </section>
+      <!-- ================= 6. LAYERS ================= -->
+      <section class="section" id="layers">
+        <div class="section-kicker">06 · Under the hood</div>
+        <h2>The four layers, explained simply</h2>
+        <p class="lede">Each layer has one job, a simple failure mode, and something that can be tested separately. That separation is what makes the project explainable and the evaluation honest.</p>
+
+        <article class="layer audio">
+          <div class="layer-head">
+            <div>
+              <div class="layer-no">LAYER 01</div>
+              <h3>Hear — siren detection</h3>
+            </div>
+            <span class="pill amber">early warning</span>
+          </div>
+          <p class="plain"><b>In plain words:</b> listen to the video's audio and decide whether an emergency siren is present, even when the vehicle is too far away to recognise.</p>
+          <div class="layer-grid">
+            <div><h4>How it works</h4><p>Short audio windows → log-mel, MFCC, spectral flux and F0-sweep features → GMM/SVM classifier (from scratch) → K-of-N smoothing.</p></div>
+            <div><h4>Why it matters</h4><p>Sound arrives earlier than pixels. This is the layer that creates the “without lag” advantage and works when the view is blocked.</p></div>
+            <div><h4>What it cannot do</h4><p>It cannot tell direction with one microphone, and horns, alarms or music can fool it. Hence it only raises a <i>tentative</i> alert.</p></div>
+            <div><h4>What we measure</h4><p>Recall on real 108 clips, false positives per hour on negative traffic audio, and detection latency.</p></div>
+          </div>
+          <div class="chips-inline">
+            <span class="pill">16 kHz mono</span>
+            <span class="pill">1.0 s window</span>
+            <span class="pill">0.25 s hop</span>
+            <span class="pill">wail / yelp / hi-lo</span>
+            <span class="pill teal">trained from scratch</span>
+          </div>
+          <details>
+            <summary>Technical details</summary>
+            <div class="detail-body">
+              Features: 64-band log-mel, 20 MFCCs plus deltas, spectral flux, harmonic energy and an F0 track in the 500–2,500 Hz band. Baseline classifiers: a Gaussian mixture per class and an RBF SVM. The optional stretch model is a small CNN on log-mel, trained from zero. Temporal decisions use 5-of-7 window consistency at 0.25 s hop. The operating threshold is chosen from the false-positives-per-hour requirement, not from accuracy alone. Training uses AudioSet-EV v2, the Asif et al. set and sireNNet; cross-dataset tests use UrbanSound8K and ESC-50 siren classes.
+            </div>
+          </details>
+        </article>
+
+        <article class="layer vision">
+          <div class="layer-head">
+            <div>
+              <div class="layer-no">LAYER 02</div>
+              <h3>See — visual confirmation</h3>
+            </div>
+            <span class="pill teal">confirmation</span>
+          </div>
+          <p class="plain"><b>In plain words:</b> look at the moving vehicle and check for the things that make it an ambulance, not just any white van.</p>
+          <div class="layer-grid">
+            <div><h4>How it works</h4><p>Background subtraction proposes moving blobs → Kalman + Hungarian tracking → per-track cues (beacon blink, livery, red cross, 108) → HOG+SVM score.</p></div>
+            <div><h4>Why it matters</h4><p>It prevents the system from switching a signal for a siren-like sound or a white tempo traveller with a roof rack.</p></div>
+            <div><h4>What it cannot do</h4><p>It is weaker than a pretrained detector on tiny or heavily occluded vehicles. That is why it is a gate, not the trigger.</p></div>
+            <div><h4>What we measure</h4><p>Track-level precision and recall, cue ablations, and false tracks per minute.</p></div>
+          </div>
+          <div class="chips-inline">
+            <span class="pill">MOG2 / KNN</span>
+            <span class="pill">Kalman + Hungarian</span>
+            <span class="pill">beacon FFT</span>
+            <span class="pill">red cross · 108 templates</span>
+            <span class="pill teal">no YOLO · no OCR</span>
+          </div>
+          <details>
+            <summary>Technical details</summary>
+            <div class="detail-body">
+              Background subtraction runs on a fixed camera with shadow detection and morphology. Tracks must pass minimum-hit and maximum-age rules. The beacon cue computes red/blue pixel energy in the top 20% of each track box over a rolling buffer and looks for a 1–4 Hz FFT peak; this distinguishes an active beacon from painted red/blue stripes. Livery cues use HSV ratios for white and yellow bodies, plus self-made template matching for a red cross and the digits “108”. The classifier is a HOG + linear SVM trained on Indian ambulance crops and hard negatives; a tiny from-scratch CNN is an optional ablation. No OCR library is used.
+            </div>
+          </details>
+        </article>
+
+        <article class="layer geo">
+          <div class="layer-head">
+            <div>
+              <div class="layer-no">LAYER 03</div>
+              <h3>Locate — arm and ETA</h3>
+            </div>
+            <span class="pill blue">India-specific</span>
+          </div>
+          <p class="plain"><b>In plain words:</b> draw the junction from above and ask two questions: which arm is it entering from, and how many seconds until it reaches the stop line?</p>
+          <div class="layer-grid">
+            <div><h4>How it works</h4><p>One-time 4-point homography → bird's-eye coordinates → approach-arm polygons and stop lines → smoothed velocity → ETA.</p></div>
+            <div><h4>Why it matters</h4><p>It turns detection into a decision: which movement to preempt and when. It also rejects vehicles that are leaving the junction.</p></div>
+            <div><h4>What it cannot do</h4><p>It assumes a fixed camera and a reasonable calibration. Camera shake or a moved tripod invalidates the mapping.</p></div>
+            <div><h4>What we measure</h4><p>Arm accuracy, ETA error at the stop line, and the resulting lead time.</p></div>
+          </div>
+          <div class="chips-inline">
+            <span class="pill">4-point homography</span>
+            <span class="pill">N / E / S / W arms</span>
+            <span class="pill">stop line</span>
+            <span class="pill">EMA velocity</span>
+            <span class="pill">lane-less reasoning</span>
+          </div>
+          <details>
+            <summary>Technical details</summary>
+            <div class="detail-body">
+              The homography is computed once per camera from four road-plane points with known spacing. Tracks are mapped to metres, and velocity is smoothed with an exponential moving average. Approach-arm assignment uses the entry zone of the track plus its heading, not a lane index. The ETA is the remaining distance along the arm divided by the smoothed speed. A track is eligible only while it is approaching, inside the junction region of interest, and has enough history. The demo renders the arm and ETA on the bird's-eye inset.
+            </div>
+          </details>
+        </article>
+
+        <article class="layer control">
+          <div class="layer-head">
+            <div>
+              <div class="layer-no">LAYER 04</div>
+              <h3>Act — safety-constrained controller</h3>
+            </div>
+            <span class="pill red">software only</span>
+          </div>
+          <p class="plain"><b>In plain words:</b> a careful traffic officer inside the computer. It requests priority, clears conflicts, gives green, and returns to normal — but only if the evidence is confirmed.</p>
+          <div class="layer-grid">
+            <div><h4>How it works</h4><p>Finite-state machine: normal → request → all-red clearance → preempt green → recovery. Abort on track loss.</p></div>
+            <div><h4>Why it matters</h4><p>Safety is explicit. A detection mistake cannot create a conflicting green, and recovery is part of the design.</p></div>
+            <div><h4>What it cannot do</h4><p>It cannot control real hardware in this version, and it cannot guarantee behaviour of human drivers.</p></div>
+            <div><h4>What we measure</h4><p>Zero conflicting greens, clearance respected, response latency, and recovery time.</p></div>
+          </div>
+          <div class="chips-inline">
+            <span class="pill">min green</span>
+            <span class="pill">yellow + all-red</span>
+            <span class="pill">conflict matrix</span>
+            <span class="pill">abort on loss</span>
+            <span class="pill">event log</span>
+          </div>
+          <details>
+            <summary>Technical details</summary>
+            <div class="detail-body">
+              States: <code>NORMAL_CYCLE</code>, <code>REQUEST</code>, <code>CLEARANCE</code>, <code>PREEMPT_GREEN</code>, <code>RECOVERY</code>, <code>ABORT</code>. Inputs: confirmed track, approach arm, ETA, time since request, current phase. Constraints: minimum green for the active phase, yellow and all-red clearance intervals, a conflict matrix that forbids simultaneous greens for conflicting arms, a maximum preemption duration, and a safe abort/recovery path if the track disappears. Every transition is written to a JSON event log for the demo and the evaluation.
+            </div>
+          </details>
+        </article>
+      </section>
+      <!-- ================= 7. NOVELTY ================= -->
+      <section class="section" id="novelty">
+        <div class="section-kicker">07 · The contribution</div>
+        <h2>What is actually new here</h2>
+        <p class="lede">The professor wants a novel contribution. “I trained a model” is not enough. The defensible contribution is a policy, an India-specific formulation, and a benchmark — each with its own experiment.</p>
+
+        <div class="novel">
+          <div class="card">
+            <div class="no">01</div>
+            <h3>Asymmetric, two-stage fusion</h3>
+            <p>Audio may <i>alert</i>, but only visual + geometric evidence may <i>act</i>. Prior work fuses scores symmetrically. We report the <b>lead-time vs false-alarm trade-off</b> of the two-stage policy.</p>
+          </div>
+          <div class="card">
+            <div class="no">02</div>
+            <h3>Arm-level, lane-less preemption</h3>
+            <p>Instead of painted-lane detection, infer the approach arm from bird's-eye trajectories and preempt that arm with explicit safety constraints — designed for Indian junctions.</p>
+          </div>
+          <div class="card">
+            <div class="no">03</div>
+            <h3>SirenFirst-108 benchmark</h3>
+            <p>A curated South India 108 evaluation set: real cited event clips, disclosed synthetic clips, and negatives, with a reproducible annotation and lead-time protocol.</p>
+          </div>
+        </div>
+
+        <div class="callout teal" style="margin-top:18px">
+          <b>Fourth, supporting claim</b>
+          Everything is trained from zero and explainable. That is not just a constraint — it enables clean cue ablations (audio only, vision only, fusion; with/without beacon) that a black-box detector cannot provide.
+        </div>
+
+        <h3 style="font-family:var(--serif);font-size:1.35rem;margin:26px 0 10px">How this differs from existing Indian EV projects</h3>
+        <div class="table-wrap">
+          <table class="table-compact">
+            <thead><tr><th>Existing approach</th><th>What it does</th><th>What SirenFirst does differently</th></tr></thead>
+            <tbody>
+              <tr><td><b>Raman et al., 2020</b></td><td>Pretrained SSD MobileNet + acoustic pitch detection on Indian roads</td><td>No pretrained weights; asymmetric audio-first fusion; arm/ETA reasoning; lead-time/error analysis</td></tr>
+              <tr><td><b>Mehendale et al., 2021</b></td><td>Siren classifier plus IoT indicators and GPS route information</td><td>Camera + audio only; no vehicle-side hardware; visual and geometric confirmation</td></tr>
+              <tr><td><b>MedRoute AI (student project)</b></td><td>YOLOv8 + EasyOCR + colour/symbol voting</td><td>No YOLO, no OCR; handcrafted cues; explicit fusion policy and benchmark</td></tr>
+              <tr><td><b>Bengaluru GPS geofencing</b></td><td>Fleet-equipped ambulances auto-green 10 junctions</td><td>Infrastructure-free video + audio; no GPS hardware in the ambulance</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="tiny muted" style="margin-top:8px">We do not claim to beat these systems. We claim a different, explainable, constraint-compliant design and a measurable lead-time/error trade-off.</p>
+      </section>
+      <!-- ================= 8. DATASETS ================= -->
+      <section class="section" id="datasets">
+        <div class="section-kicker">08 · The evidence</div>
+        <h2>The data: what trains, what tests, what appears in the demo</h2>
+        <p class="lede">Three different jobs, three different kinds of data. Training data teaches the models. Evaluation data proves they generalise. Demo footage shows the whole system working on recognisable Indian roads. These must not be quietly mixed.</p>
+
+        <div class="role-grid">
+          <div class="role"><b>Train</b><span>Audio clips and labelled vehicle crops. Used for fitting only.</span></div>
+          <div class="role"><b>Validate</b><span>Held-out clips and source images. Thresholds and policy choices are tuned here.</span></div>
+          <div class="role"><b>Test</b><span>Untouched event clips and negatives. Reported once, by default.</span></div>
+          <div class="role"><b>Demo</b><span>Cited real clips plus disclosed synthetic composites. Not used to tune.</span></div>
+        </div>
+
+        <div class="dset-group">
+          <div class="group-head"><span class="tag">A</span><div><h3 style="margin:0">Audio training and testing</h3><p class="tiny muted" style="margin:2px 0 0">Siren positives, traffic negatives, and cross-dataset checks.</p></div></div>
+          <div class="dset-grid">
+            <div class="dset">
+              <div class="dset-top"><h4>AudioSet-EV v2</h4><span class="pill">primary</span></div>
+              <div class="dset-meta">~28,000 clips · ~16 GB zip / ~28 GB extracted · CC BY 4.0</div>
+              <p>A curated emergency-vehicle audio release on Zenodo: roughly 7,900 siren clips and 20,900 negatives. The main training and held-out test source for the audio branch.</p>
+              <div class="chips-inline"><span class="pill">~7.9k siren</span><span class="pill">~20.9k negative</span><span class="pill">pre-split</span></div>
+              <a class="src" href="https://doi.org/10.5281/zenodo.14882313" target="_blank" rel="noopener">doi.org/10.5281/zenodo.14882313</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>Asif et al. siren/road</h4><span class="pill">train + test</span></div>
+              <div class="dset-meta">1,800 files · 900 siren / 900 road · 3–15 s · figshare</div>
+              <p>Small, clean binary set. Useful for a quick baseline and for checking whether the model learned siren structure rather than dataset artefacts.</p>
+              <div class="chips-inline"><span class="pill">900 + 900</span><span class="pill">short clips</span></div>
+              <a class="src" href="https://doi.org/10.6084/m9.figshare.19291472" target="_blank" rel="noopener">doi.org/10.6084/m9.figshare.19291472</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>sireNNet</h4><span class="pill">train + test</span></div>
+              <div class="dset-meta">400 ambulance · 454 police · 400 fire · 421 traffic · Mendeley Data</div>
+              <p>Adds emergency-vehicle variety and hard traffic negatives. Also useful to test whether the model overfires on police or fire sirens.</p>
+              <div class="chips-inline"><span class="pill">4 classes</span><span class="pill">hard negatives</span></div>
+              <a class="src" href="https://doi.org/10.17632/j4ydzzv4kb.1" target="_blank" rel="noopener">doi.org/10.17632/j4ydzzv4kb.1</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>UrbanSound8K + ESC-50</h4><span class="pill">test only</span></div>
+              <div class="dset-meta">Public benchmark sets · siren classes only</div>
+              <p>Never used for training. Their siren classes give a cross-dataset sanity check: does performance collapse outside the training distribution?</p>
+              <div class="chips-inline"><span class="pill">external validity</span><span class="pill">no tuning</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dset-group">
+          <div class="group-head"><span class="tag">B</span><div><h3 style="margin:0">Visual training and testing</h3><p class="tiny muted" style="margin:2px 0 0">Indian ambulance appearance, plus hard negatives that look similar.</p></div></div>
+          <div class="dset-grid">
+            <div class="dset">
+              <div class="dset-top"><h4>Roboflow · Indian Emergency Vehicles</h4><span class="pill">primary</span></div>
+              <div class="dset-meta">8,227 images · 24 classes · CC BY 4.0</div>
+              <p>The largest Indian-specific source found. Contains ambulances, police, fire and other emergency vehicles. It likely includes augmented copies, so <b>split by source image</b>, never by augmented file.</p>
+              <div class="chips-inline"><span class="pill">24 classes</span><span class="pill red">dedupe first</span></div>
+              <a class="src" href="https://universe.roboflow.com/avanthika-s-nfpex/indian-emergency-vehicles" target="_blank" rel="noopener">universe.roboflow.com/avanthika-s-nfpex/indian-emergency-vehicles</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>Wikimedia · Ambulances in India</h4><span class="pill">real photos</span></div>
+              <div class="dset-meta">58 photographs · CC BY-SA per file</div>
+              <p>Real, high-quality Indian ambulance photos for cue design and calibration. Attribution and share-alike terms apply per file.</p>
+              <div class="chips-inline"><span class="pill">58 photos</span><span class="pill">attribution required</span></div>
+              <a class="src" href="https://commons.wikimedia.org/wiki/Category:Ambulances_in_India" target="_blank" rel="noopener">commons.wikimedia.org/wiki/Category:Ambulances_in_India</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>Kaggle Indian Emergency Vehicles</h4><span class="pill">verify licence</span></div>
+              <div class="dset-meta">~9,400 images · publisher: ganeshmohane</div>
+              <p>Useful extra Indian imagery, but the licence and provenance must be checked before it is committed or redistributed. Prefer linking over copying.</p>
+              <div class="chips-inline"><span class="pill">~9.4k images</span><span class="pill red">licence check</span></div>
+              <a class="src" href="https://www.kaggle.com/datasets/ganeshmohane/indian-emergency-vehicles" target="_blank" rel="noopener">kaggle.com/datasets/ganeshmohane/indian-emergency-vehicles</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>AV-JantaHack-CV</h4><span class="pill">verify licence</span></div>
+              <div class="dset-meta">2,352 images · Indian traffic/emergency context</div>
+              <p>Extra scene variety, especially for hard negatives and small vehicles. Check terms before use in any public release.</p>
+              <div class="chips-inline"><span class="pill">2,352 images</span><span class="pill red">licence check</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dset-group">
+          <div class="group-head"><span class="tag">C</span><div><h3 style="margin:0">Video and demo footage</h3><p class="tiny muted" style="margin:2px 0 0">Whole-event sequences: the unit of evaluation, not single frames.</p></div></div>
+          <div class="dset-grid">
+            <div class="dset">
+              <div class="dset-top"><h4>South Indian 108 / ambulance clips</h4><span class="pill">demo + test</span></div>
+              <div class="dset-meta">Public YouTube / CCTV clips · cite source and access date</div>
+              <p>Two to three fixed-camera or near-fixed clips with a visible junction approach, ideally Chennai, Bengaluru, Hyderabad or Kochi. Used for hand annotation and qualitative demo; raw media is not redistributed.</p>
+              <div class="chips-inline"><span class="pill">108 livery</span><span class="pill">junction approach</span><span class="pill red">citation required</span></div>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>EMT dataset</h4><span class="pill">cross-domain test</span></div>
+              <div class="dset-meta">57 minutes · Gulf traffic · GitHub, AV-Lab</div>
+              <p>Useful for checking robustness to a different country, camera and livery. Not South Indian, so it cannot replace the local benchmark.</p>
+              <div class="chips-inline"><span class="pill">57 min</span><span class="pill">different domain</span></div>
+              <a class="src" href="https://github.com/AV-Lab/emt-dataset" target="_blank" rel="noopener">github.com/AV-Lab/emt-dataset</a>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>Disclosed synthetic composites</h4><span class="pill">train + demo</span></div>
+              <div class="dset-meta">Self-made · ambulance crop composited onto Indian junction footage</div>
+              <p>Necessary because campus has no ambulances and real event clips are scarce. Composites must be labelled synthetic in the filename, report and demo. Real and synthetic results are reported separately.</p>
+              <div class="chips-inline"><span class="pill">scale + control</span><span class="pill amber">must disclose</span></div>
+            </div>
+            <div class="dset">
+              <div class="dset-top"><h4>Kaggle test videos</h4><span class="pill">supplementary</span></div>
+              <div class="dset-meta">Short traffic clips · licence varies per upload</div>
+              <p>Only after checking terms. Useful as extra negatives or for stress tests, not as the core benchmark.</p>
+              <div class="chips-inline"><span class="pill">stress tests</span><span class="pill red">verify first</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout red">
+          <b>Data rules</b>
+          Never commit raw datasets to the repo. Download into <code>data/</code> (git-ignored), record URLs and licences in <code>docs/DATASETS.md</code>, cite every YouTube/CCTV clip with channel, title and access date, and label every synthetic asset. If a dataset's licence is unclear, do not redistribute it.
+        </div>
+      </section>
+
+      <!-- ================= 9. RESOURCES ================= -->
+      <section class="section" id="resources">
+        <div class="section-kicker">09 · What we will use</div>
+        <h2>Resources we will use</h2>
+        <p class="lede">A practical inventory of the data, software and reading behind the build. Every dataset is used within its licence; every model is trained from scratch.</p>
+
+        <div class="res-grid">
+          <div class="res-card">
+            <h3><span class="res-badge">A</span>Audio data</h3>
+            <ul class="res-list">
+              <li><a href="https://doi.org/10.5281/zenodo.14882313" target="_blank" rel="noopener">AudioSet-EV v2</a><span>Main siren positives and traffic negatives for training and held-out testing.</span></li>
+              <li><a href="https://doi.org/10.6084/m9.figshare.19291472" target="_blank" rel="noopener">Asif et al. siren/road set</a><span>Clean binary baseline: 900 siren clips and 900 road-noise clips.</span></li>
+              <li><a href="https://doi.org/10.17632/j4ydzzv4kb.1" target="_blank" rel="noopener">sireNNet</a><span>Extra emergency-vehicle variety and hard traffic negatives.</span></li>
+              <li><span class="res-plain">UrbanSound8K · ESC-50</span><span>Cross-dataset test only; their siren classes are never used for fitting.</span></li>
+            </ul>
+          </div>
+
+          <div class="res-card">
+            <h3><span class="res-badge">B</span>Visual data</h3>
+            <ul class="res-list">
+              <li><a href="https://universe.roboflow.com/avanthika-s-nfpex/indian-emergency-vehicles" target="_blank" rel="noopener">Roboflow · Indian Emergency Vehicles</a><span>8,227 Indian images across 24 classes; split by source image after deduplication.</span></li>
+              <li><a href="https://commons.wikimedia.org/wiki/Category:Ambulances_in_India" target="_blank" rel="noopener">Wikimedia · Ambulances in India</a><span>58 real photographs for cue design and appearance checks; attribution per file.</span></li>
+              <li><span class="res-plain">Kaggle Indian Emergency Vehicles · AV-JantaHack-CV</span><span>Supplementary Indian imagery and hard negatives, only after licence verification.</span></li>
+              <li><a href="https://github.com/AV-Lab/emt-dataset" target="_blank" rel="noopener">EMT dataset</a><span>57 minutes of Gulf traffic for cross-domain robustness testing.</span></li>
+            </ul>
+          </div>
+
+          <div class="res-card">
+            <h3><span class="res-badge">C</span>Video and demo footage</h3>
+            <ul class="res-list">
+              <li><span class="res-plain">South Indian 108 / ambulance clips</span><span>Public YouTube or CCTV junction clips, cited with channel, title, URL and access date. Raw media is not redistributed.</span></li>
+              <li><span class="res-plain">Disclosed synthetic composites</span><span>Ambulance crops composited onto real junction footage to enlarge the benchmark; labelled synthetic everywhere.</span></li>
+              <li><span class="res-plain">Kaggle test videos</span><span>Supplementary stress clips only, after checking the uploader's terms.</span></li>
+            </ul>
+          </div>
+
+          <div class="res-card">
+            <h3><span class="res-badge">D</span>Software stack</h3>
+            <ul class="res-list">
+              <li><a href="https://www.python.org/" target="_blank" rel="noopener">Python 3.10+</a><span>Language for the full pipeline, training and evaluation.</span></li>
+              <li><a href="https://opencv.org/" target="_blank" rel="noopener">OpenCV</a><span>Video I/O, background subtraction, tracking, warping and rendering.</span></li>
+              <li><a href="https://numpy.org/" target="_blank" rel="noopener">NumPy · SciPy</a><span>Arrays, signal processing, FFT and numerical utilities.</span></li>
+              <li><a href="https://scikit-learn.org/" target="_blank" rel="noopener">scikit-learn</a><span>GMM, SVM, HOG pipeline, calibration and metric helpers.</span></li>
+              <li><a href="https://librosa.org/" target="_blank" rel="noopener">librosa</a><span>Audio loading, resampling, log-mel, MFCC and spectral features.</span></li>
+              <li><a href="https://ffmpeg.org/" target="_blank" rel="noopener">FFmpeg</a><span>Audio extraction, video transcode, frame export and final MP4 assembly.</span></li>
+              <li><a href="https://pytorch.org/" target="_blank" rel="noopener">PyTorch</a><span>Optional only: tiny from-scratch CNN ablation, never pretrained weights.</span></li>
+              <li><a href="https://pandas.pydata.org/" target="_blank" rel="noopener">pandas · Matplotlib</a><span>Metrics tables, result summaries and figures for the report.</span></li>
+              <li><a href="https://docs.pytest.org/" target="_blank" rel="noopener">pytest · Git</a><span>Unit tests for the FSM and geometry, plus reproducible version control.</span></li>
+            </ul>
+          </div>
+
+          <div class="res-card">
+            <h3><span class="res-badge">E</span>Documentation</h3>
+            <ul class="res-list">
+              <li><a href="https://docs.opencv.org/" target="_blank" rel="noopener">OpenCV documentation</a><span>Calibration, homography, optical flow and video writer behaviour.</span></li>
+              <li><a href="https://librosa.org/doc/latest/" target="_blank" rel="noopener">librosa documentation</a><span>Feature parameters and audio loading conventions.</span></li>
+              <li><a href="https://scikit-learn.org/stable/user_guide.html" target="_blank" rel="noopener">scikit-learn user guide</a><span>Model selection, calibration and evaluation practice.</span></li>
+            </ul>
+          </div>
+
+          <div class="res-card">
+            <h3><span class="res-badge">F</span>Papers and prior systems</h3>
+            <ul class="res-list">
+              <li><span class="res-plain">Raman et al., 2020</span><span>Pretrained detector plus acoustic siren detection on Indian roads. Main point of contrast.</span></li>
+              <li><span class="res-plain">Mehendale et al., 2021</span><span>Siren classification with IoT indicators and GPS route information.</span></li>
+              <li><span class="res-plain">MedRoute AI</span><span>Student system using YOLOv8, EasyOCR and symbol voting.</span></li>
+              <li><span class="res-plain">Bengaluru GPS geofencing, 2024</span><span>Fleet-equipped ambulances auto-green ten junctions; the infrastructure-free contrast.</span></li>
+              <li><a href="docs/PROJECT_CONTEXT.md">Full citation notes</a><span>Context, claims and the exact comparison points live in the project document.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout red">
+          <b>Not in the resource list</b>
+          No YOLO/Ultralytics, no pretrained torchvision or timm weights, no EasyOCR/PaddleOCR, and no downloaded checkpoints. Those are excluded by the project constraint, not forgotten.
+        </div>
+      </section>
+
+      <!-- ================= 10. EVENT TIMELINE ================= -->
+      <section class="section" id="event">
+        <div class="section-kicker">10 · The demo, second by second</div>
+        <h2>One event, from siren to green</h2>
+        <p class="lede">An illustrative timeline, not a measurement. It shows the intended behaviour and the exact moment where each layer is allowed to influence the next.</p>
+
+        <figure class="figure">
+          <svg viewBox="0 0 1120 300" role="img" aria-labelledby="tlTitle tlDesc">
+            <title id="tlTitle">Ambulance event timeline</title>
+            <desc id="tlDesc">Timeline from normal junction operation at zero seconds to audio tentative alert, visual confirmation, signal request, clearance, preemption green, crossing and recovery.</desc>
+            <line x1="40" y1="150" x2="1080" y2="150" stroke="#cbbfa9" stroke-width="3"></line>
+            <g font-family="system-ui,sans-serif">
+              <g>
+                <circle cx="70" cy="150" r="8" fill="#9aa6a8"></circle>
+                <text x="70" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#43555a">0.0 s</text>
+                <text x="70" y="182" text-anchor="middle" font-size="11" fill="#5d7277">normal</text>
+                <text x="70" y="199" text-anchor="middle" font-size="10" fill="#7b8c90">junction cycles</text>
+              </g>
+              <g>
+                <circle cx="230" cy="150" r="8" fill="#d0a044"></circle>
+                <text x="230" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#8a6420">1.5 s</text>
+                <text x="230" y="129" text-anchor="middle" font-size="11" fill="#8a6420">audio alert</text>
+                <text x="230" y="182" text-anchor="middle" font-size="10" fill="#7b8c90">tentative only</text>
+                <text x="230" y="198" text-anchor="middle" font-size="10" fill="#7b8c90">signal unchanged</text>
+              </g>
+              <g>
+                <circle cx="400" cy="150" r="8" fill="#3c9a8b"></circle>
+                <text x="400" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#2a6e63">3.0 s</text>
+                <text x="400" y="182" text-anchor="middle" font-size="11" fill="#2a6e63">vehicle seen</text>
+                <text x="400" y="199" text-anchor="middle" font-size="10" fill="#7b8c90">track + cues begin</text>
+              </g>
+              <g>
+                <circle cx="570" cy="150" r="8" fill="#66508f"></circle>
+                <text x="570" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#4a3670">4.5 s</text>
+                <text x="570" y="129" text-anchor="middle" font-size="11" fill="#4a3670">confirmed</text>
+                <text x="570" y="182" text-anchor="middle" font-size="10" fill="#7b8c90">south arm</text>
+                <text x="570" y="198" text-anchor="middle" font-size="10" fill="#7b8c90">ETA ≈ 8 s</text>
+              </g>
+              <g>
+                <circle cx="720" cy="150" r="8" fill="#c98a3c"></circle>
+                <text x="720" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#8a5a1e">5.5 s</text>
+                <text x="720" y="182" text-anchor="middle" font-size="11" fill="#8a5a1e">clearance</text>
+                <text x="720" y="199" text-anchor="middle" font-size="10" fill="#7b8c90">yellow → all-red</text>
+              </g>
+              <g>
+                <circle cx="860" cy="150" r="8" fill="#3c7d55"></circle>
+                <text x="860" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#2f6b46">7.0 s</text>
+                <text x="860" y="129" text-anchor="middle" font-size="11" fill="#2f6b46">preempt green</text>
+                <text x="860" y="182" text-anchor="middle" font-size="10" fill="#7b8c90">south corridor</text>
+                <text x="860" y="198" text-anchor="middle" font-size="10" fill="#7b8c90">conflicts held</text>
+              </g>
+              <g>
+                <circle cx="985" cy="150" r="8" fill="#c0392b"></circle>
+                <text x="985" y="130" text-anchor="middle" font-size="11" font-weight="700" fill="#8e2f27">≈11 s</text>
+                <text x="985" y="182" text-anchor="middle" font-size="11" fill="#8e2f27">crosses line</text>
+                <text x="985" y="199" text-anchor="middle" font-size="10" fill="#7b8c90">track continues</text>
+              </g>
+              <g>
+                <circle cx="1065" cy="150" r="8" fill="#7b8c90"></circle>
+                <text x="1065" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#5d7277">16 s</text>
+                <text x="1065" y="129" text-anchor="middle" font-size="11" fill="#5d7277">recovery</text>
+                <text x="1065" y="182" text-anchor="middle" font-size="10" fill="#7b8c90">normal resumes</text>
+              </g>
+            </g>
+            <rect x="150" y="234" width="720" height="30" rx="8" fill="#f7eadf"></rect>
+            <text x="510" y="254" text-anchor="middle" font-family="system-ui,sans-serif" font-size="10.5" fill="#8a5a1e">early-warning window: audio has already heard the siren before the vehicle is identifiable</text>
+          </svg>
+          <figcaption>Illustrative only. The real timings come from the end-to-end runs; the signal is simulated in software.</figcaption>
+        </figure>
+
+        <div class="event-notes">
+          <div><b>0–3 s · warning</b><span>The amber UI says “siren suspected”. Nothing switches. This is where the lead-time advantage is created.</span></div>
+          <div><b>3–4.5 s · evidence</b><span>Beacon, livery, 108 and geometry must agree. If they do not, the system stays tentative.</span></div>
+          <div><b>4.5–7 s · safety</b><span>Minimum green, yellow and all-red are respected before the preempted green appears.</span></div>
+          <div><b>11–16 s · recovery</b><span>When the track clears or times out, the controller returns to the normal cycle instead of staying stuck.</span></div>
+        </div>
+      </section>
+
+      <!-- ================= 11. ACHIEVE ================= -->
+      <section class="section" id="achieve">
+        <div class="section-kicker">11 · Execution</div>
+        <h2>How we actually achieve it</h2>
+        <p class="lede">The plan is deliberately boring: build the smallest testable loop first, prove each layer on saved data, then integrate. No layer is allowed to be a demo-only illusion.</p>
+
+        <div class="flow">
+          <div class="flow-step"><span class="n">1</span><b>Freeze the protocol</b><p>Define events, arms, lead time, false alarms, and the split before modelling.</p></div>
+          <div class="flow-step"><span class="n">2</span><b>Build baselines</b><p>Energy/spectral audio baseline and motion-only vision baseline. They set the floor.</p></div>
+          <div class="flow-step"><span class="n">3</span><b>Train from zero</b><p>GMM/SVM audio, HOG/SVM vision, then optional tiny CNNs as ablations.</p></div>
+          <div class="flow-step"><span class="n">4</span><b>Calibrate geometry</b><p>One junction, four arms, measured stop lines and bird's-eye mapping.</p></div>
+          <div class="flow-step"><span class="n">5</span><b>Integrate the gate</b><p>Audio tentative, visual confirmation, safety FSM, event log.</p></div>
+          <div class="flow-step"><span class="n">6</span><b>Evaluate honestly</b><p>Real and synthetic separately, ablations, failure cases, reproducibility.</p></div>
+        </div>
+
+        <div class="grid g2" style="margin-top:22px">
+          <div class="card">
+            <h3>The hard parts, and the response</h3>
+            <ul class="check">
+              <li><b>No pretrained detector:</b> use scene-specific motion, beacon/livery cues and a from-scratch classifier; keep vision as a gate.</li>
+              <li><b>Few Indian event clips:</b> curate 10–20 real events, add disclosed synthetic composites, and report both.</li>
+              <li><b>Lane-less traffic:</b> reason about the approach arm in bird's-eye coordinates, not painted lanes.</li>
+              <li><b>Audio false alarms:</b> hard negatives, K-of-N smoothing, and an operating point set by FP/hour.</li>
+              <li><b>Limited time:</b> do not chase every cue. Ship the four-layer pipeline and a clean evaluation first.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>What “from scratch” means here</h3>
+            <ul class="check">
+              <li>No downloaded weights, including “backbone only” weights.</li>
+              <li>Classical models are fitted on our training split.</li>
+              <li>Any neural model is initialised randomly and trained by us.</li>
+              <li>Preprocessing (resize, mel filterbank) is allowed; it is not a pretrained model.</li>
+              <li>Every model card records data, hyperparameters, seed and commit.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout">
+          <b>The integration contract</b>
+          Each layer exposes a small, typed interface: audio → <code>{p_siren, onset_s}</code>; vision → tracks with cue scores; geometry → <code>{arm, distance_m, eta_s}</code>; fusion → <code>{state, confidence, reason}</code>; controller → signal phase plus log entry. This is what makes the system testable and the demo debuggable.
+        </div>
+      </section>
+      <!-- ================= 12. METRICS ================= -->
+      <section class="section" id="metrics">
+        <div class="section-kicker">12 · Evaluation</div>
+        <h2>How success will be measured</h2>
+        <p class="lede">The headline is not mAP. It is <b>lead time at a controlled false-alarm rate</b>, with safety and latency reported alongside it. Targets below are planning targets, not results.</p>
+
+        <div class="table-wrap">
+          <table class="metrics-table">
+            <thead><tr><th>Layer</th><th>Primary metric</th><th>Provisional target</th><th>Why this metric</th></tr></thead>
+            <tbody>
+              <tr><td>Audio</td><td>Recall at a fixed false-positive rate</td><td>≥ 0.85 recall at ≤ 2 FP/hour</td><td>A siren detector that fires constantly is useless.</td></tr>
+              <tr><td>Audio</td><td>Detection latency</td><td>≤ 1.5 s after siren onset</td><td>Early warning is the whole point.</td></tr>
+              <tr><td>Vision</td><td>Track-level precision / recall</td><td>≥ 0.80 / ≥ 0.75</td><td>Frame mAP hides identity switches and false tracks.</td></tr>
+              <tr><td>Geometry</td><td>Approach-arm accuracy</td><td>≥ 0.90</td><td>Wrong arm means wrong preemption.</td></tr>
+              <tr><td>Geometry</td><td>ETA mean absolute error</td><td>≤ 2 s near the stop line</td><td>ETA turns detection into a timed decision.</td></tr>
+              <tr><td>End-to-end</td><td>Median lead time</td><td>≥ 5 s at ≤ 1 FP/hour</td><td>The central claim of the project.</td></tr>
+              <tr><td>Runtime</td><td>Processing latency / throughput</td><td>≤ 200 ms/frame, ≥ 10 FPS</td><td>“Without lag” must be demonstrated, not assumed.</td></tr>
+              <tr><td>Controller</td><td>Conflicting greens / unsafe transitions</td><td>0 in all tests</td><td>Safety is non-negotiable.</td></tr>
+              <tr><td>Controller</td><td>Recovery time to normal cycle</td><td>≤ 5 s after clear/timeout</td><td>A stuck preemption is a failure.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="grid g2" style="margin-top:20px">
+          <div class="card">
+            <h3>The headline curve</h3>
+            <p class="small muted">Plot <b>median lead time</b> against <b>false alarms per hour</b> while sweeping the fusion threshold. Compare audio-only, vision-only, and fused. The fused curve should be better, or the project has learned something equally interesting.</p>
+            <div class="chips-inline"><span class="pill">x: FP/hour</span><span class="pill">y: lead time</span><span class="pill">3 curves</span></div>
+          </div>
+          <div class="card">
+            <h3>Required ablations</h3>
+            <ul class="check">
+              <li>Audio only vs vision only vs fusion.</li>
+              <li>Fusion without beacon; without livery; without 108.</li>
+              <li>Classical model vs optional tiny CNN.</li>
+              <li>Real test set vs synthetic test set, reported separately.</li>
+              <li>Clean vs degraded video (night, blur, occlusion).</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="callout teal">
+          <b>Statistical honesty</b>
+          With 10–20 real events, report per-event results and confidence intervals where possible. Do not quote four decimal places from a tiny test set. A clear failure table is more credible than a suspiciously perfect score.
+        </div>
+      </section>
+
+      <!-- ================= 13. SHOW / DON'T CLAIM ================= -->
+      <section class="section" id="show">
+        <div class="section-kicker">13 · Integrity</div>
+        <h2>What we show, and what we do not claim</h2>
+        <div class="grid g2">
+          <div class="card good">
+            <h3>We will show</h3>
+            <ul class="yes">
+              <li>A working end-to-end software demo on a fixed junction.</li>
+              <li>Each layer's contribution through ablations.</li>
+              <li>A lead-time vs false-alarm curve with real and synthetic results separated.</li>
+              <li>Failure cases: night, occlusion, siren-like noise, wrong arm.</li>
+              <li>A reproducible benchmark and a one-command run.</li>
+              <li>A clear limitations and future-work section.</li>
+            </ul>
+          </div>
+          <div class="card bad">
+            <h3>We will not claim</h3>
+            <ul class="no">
+              <li>State-of-the-art detection accuracy.</li>
+              <li>Deployment on real traffic signals.</li>
+              <li>All-weather, all-camera robustness.</li>
+              <li>Direction of arrival from a single microphone.</li>
+              <li>That synthetic clips are real footage.</li>
+              <li>That the problem is “solved”.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 14. RISKS ================= -->
+      <section class="section" id="risks">
+        <div class="section-kicker">14 · Risks</div>
+        <h2>What can go wrong, and the fallback</h2>
+        <div class="table-wrap">
+          <table class="risk-table">
+            <thead><tr><th>Risk</th><th>Impact</th><th>Mitigation / fallback</th></tr></thead>
+            <tbody>
+              <tr><td><b>Visual detection generalises poorly</b></td><td class="bad-cell">High</td><td>Keep vision as a gate; rely on beacon/livery cues; train on hard negatives; report real vs synthetic; add more Indian crops.</td></tr>
+              <tr><td><b>Too few real event clips</b></td><td class="bad-cell">High</td><td>Curate 10–20 cited YouTube/CCTV events; add disclosed synthetic composites; make the benchmark size an explicit Round 2 question.</td></tr>
+              <tr><td><b>Audio false positives</b></td><td class="warn-cell">Medium</td><td>Hard negatives, K-of-N smoothing, threshold at FP/hour; never let audio act alone.</td></tr>
+              <tr><td><b>Calibration drift or camera shake</b></td><td class="warn-cell">Medium</td><td>Fixed-camera assumption; calibration sanity check; demo re-calibration; mark clips that fail.</td></tr>
+              <tr><td><b>Timeline slips</b></td><td class="warn-cell">Medium</td><td>Cut optional CNNs and synthetic volume first; protect FSM, evaluation and demo.</td></tr>
+              <tr><td><b>Novelty is challenged</b></td><td class="bad-cell">High</td><td>Defend the three claims with experiments: fusion trade-off, arm-level preemption, and the benchmark.</td></tr>
+              <tr><td><b>Safety logic is questioned</b></td><td class="bad-cell">High</td><td>Explicit FSM, conflict matrix, minimum green, all-red, abort and recovery tests; log every transition.</td></tr>
+              <tr><td><b>Privacy / copyright of footage</b></td><td class="warn-cell">Medium</td><td>Use public clips with citation; do not redistribute raw media; blur faces/plates where practical; document licences.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <!-- ================= 15. ROUND 1 ================= -->
+      <section class="section" id="round1">
+        <div class="section-kicker">15 · What we already know</div>
+        <h2>Round 1 answers from the professor</h2>
+        <p class="lede">These answers shaped the design. The important clarification is that “no YOLO” means <b>no pretrained weights</b>; training from scratch is explicitly allowed.</p>
+
+        <div class="table-wrap">
+          <table class="qa-table">
+            <thead><tr><th style="width:38px">#</th><th>Question</th><th>Answer</th><th>What it changes</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Can we use pretrained models?</td><td><b>No pretrained weights.</b> Training from scratch is allowed.</td><td>Classical + from-scratch models only; no YOLO/timm/torchvision weights.</td></tr>
+              <tr><td>2</td><td>Can we use audio?</td><td><b>Yes, allowed and encouraged.</b></td><td>Audio becomes the early-warning branch, not an optional extra.</td></tr>
+              <tr><td>3</td><td>Paper or working prototype?</td><td><b>Working prototype.</b></td><td>Demo and measurable behaviour are required; no paper-only submission.</td></tr>
+              <tr><td>4</td><td>Hardware or software?</td><td><b>Software only.</b></td><td>Signal controller is a simulated FSM; no traffic-light hardware.</td></tr>
+              <tr><td>5</td><td>Which datasets?</td><td><b>Open-source or anything</b> is fine.</td><td>Public audio and Indian vehicle data, with licences recorded.</td></tr>
+              <tr><td>6</td><td>Can we film campus ambulances?</td><td><b>No campus ambulances</b>; find another route.</td><td>Public clips + disclosed synthetic composites as primary footage.</td></tr>
+              <tr><td>7</td><td>Is synthetic data allowed?</td><td><b>Yes.</b></td><td>Composites can enlarge the benchmark, but must be labelled and reported separately.</td></tr>
+              <tr><td>8</td><td>Which region first?</td><td><b>South India first</b>, then expand.</td><td>108 livery and South Indian junction footage take priority.</td></tr>
+              <tr><td>9</td><td>How will it be evaluated?</td><td><b>Everything will be checked.</b></td><td>Metrics, ablations, failure cases and reproducibility all matter.</td></tr>
+              <tr><td>10</td><td>Is novelty required?</td><td><b>Yes, aiming for a novel contribution.</b></td><td>Fusion policy, arm-level formulation and benchmark become central.</td></tr>
+              <tr><td>11</td><td>Can we use YouTube clips?</td><td><b>Yes, with proper citation.</b></td><td>Cite channel, title, URL and access date; do not redistribute raw media.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout teal">
+          <b>Net result</b>
+          All 11 answers are compatible with the SirenFirst design. Nothing in Round 1 blocks the project. Round 2 is about sharpening scope and what the professor will accept as evidence.
+        </div>
+      </section>
+
+      <!-- ================= 16. ROUND 2 ================= -->
+      <section class="section" id="questions">
+        <div class="section-kicker">16 · What we still need</div>
+        <h2>Round 2 questions for the professor</h2>
+        <p class="lede">Ten decisions that change what gets built or how it is judged. Each question says why it matters; type the professor's answer or your notes underneath. Answers stay in this browser; use Save, Download or Copy below.</p>
+
+        <div class="form-note no-print">
+          <b>How this works:</b> there are no multiple-choice options. Record the professor's wording in the answer box for each question. Nothing is submitted anywhere; the page saves locally in this browser. Use <b>Download all answers (.txt)</b> to send one file containing every question, answer and decision, or <b>Copy all answers</b> if your browser blocks downloads.
+        </div>
+
+        <form id="answerForm" autocomplete="off">
+
+          <fieldset class="q" data-q="1">
+            <legend><span class="qno">Q1</span> Which novelty claim should we lead with?</legend>
+            <p class="qhelp"><b>Why we ask:</b> the headline decides which experiment gets priority and how the report is framed. The candidates are the asymmetric fusion policy, arm-level lane-less preemption, and the SirenFirst-108 benchmark.</p>
+            <textarea class="qnote" name="q1" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="2">
+            <legend><span class="qno">Q2</span> Is a benchmark of 10–20 real events acceptable?</legend>
+            <p class="qhelp"><b>Why we ask:</b> real South Indian event clips are scarce. The answer decides whether synthetic composites can carry part of the evaluation, and whether the benchmark needs to be larger.</p>
+            <textarea class="qnote" name="q2" rows="3" placeholder="Professor's answer / notes, including any required clip count"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="3">
+            <legend><span class="qno">Q3</span> Which baselines must we compare against?</legend>
+            <p class="qhelp"><b>Why we ask:</b> we cannot use pretrained YOLO inside the system, but an off-the-shelf detector could still be reported as an upper-bound reference. The answer decides whether that comparison is allowed or expected.</p>
+            <textarea class="qnote" name="q3" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="4">
+            <legend><span class="qno">Q4</span> Is one fixed four-arm junction enough?</legend>
+            <p class="qhelp"><b>Why we ask:</b> scope decides how much calibration and footage we need. One junction keeps the arm-level claim testable; more junctions strengthen generalisation but add significant work.</p>
+            <textarea class="qnote" name="q4" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="5">
+            <legend><span class="qno">Q5</span> What robustness level is required?</legend>
+            <p class="qhelp"><b>Why we ask:</b> night, rain and occlusion are expensive to cover. We need an explicit minimum so the evaluation scope is honest.</p>
+            <textarea class="qnote" name="q5" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+          <fieldset class="q" data-q="6">
+            <legend><span class="qno">Q6</span> What should be the primary end-to-end metric?</legend>
+            <p class="qhelp"><b>Why we ask:</b> we will report several numbers, but one has to be the headline in the abstract and viva. Median lead time at a fixed false-alarm rate is the current proposal.</p>
+            <textarea class="qnote" name="q6" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="7">
+            <legend><span class="qno">Q7</span> What should the final deliverable look like?</legend>
+            <p class="qhelp"><b>Why we ask:</b> a clean CLI demo with annotated video is reproducible; a live dashboard is more impressive but costs build time. The answer sets the expected demo format.</p>
+            <textarea class="qnote" name="q7" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="8">
+            <legend><span class="qno">Q8</span> What reporting and checkpoints do you expect?</legend>
+            <p class="qhelp"><b>Why we ask:</b> this sets the review rhythm and how early results are needed. It is a planning question, not a request for a detailed schedule.</p>
+            <textarea class="qnote" name="q8" rows="3" placeholder="Professor's answer / notes, including report format or review dates"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="9">
+            <legend><span class="qno">Q9</span> What is acceptable for YouTube and synthetic data?</legend>
+            <p class="qhelp"><b>Why we ask:</b> we need a defensible citation and ethics position before building the benchmark. The current proposal is public clips with full citation plus clearly labelled synthetic composites.</p>
+            <textarea class="qnote" name="q9" rows="3" placeholder="Professor's answer / notes, including any institutional rule"></textarea>
+          </fieldset>
+
+          <fieldset class="q" data-q="10">
+            <legend><span class="qno">Q10</span> Should the tiny from-scratch CNN be included?</legend>
+            <p class="qhelp"><b>Why we ask:</b> it is a strong ablation but not required for the core system. The answer tells us whether to protect time for it or leave it as an optional stretch.</p>
+            <textarea class="qnote" name="q10" rows="3" placeholder="Professor's answer / notes"></textarea>
+          </fieldset>
+        </form>
+
+        <div class="form-actions no-print">
+          <button class="btn btn-primary" type="button" id="saveAnswersBtn">Save answers</button>
+          <button class="btn btn-outline js-download" type="button">Download all answers (.txt)</button>
+          <button class="btn btn-outline js-copy" type="button">Copy all answers</button>
+          <span class="saved save-status" id="answerStatus" aria-live="polite"></span>
+        </div>
+
+        <details class="export-fallback no-print">
+          <summary>Download not starting? Show the text to copy</summary>
+          <p class="export-help">The text file is generated locally. If your browser blocks downloads, open this box, copy the text into a file and send that file.</p>
+          <textarea class="export-text" readonly rows="12" aria-label="Questions, answers and decisions as plain text"></textarea>
+          <div class="export-copy"><button class="btn btn-outline js-copy" type="button">Copy text</button></div>
+        </details>
+      </section>
+
+      <!-- ================= 17. DECISIONS ================= -->
+      <section class="section" id="decisions">
+        <div class="section-kicker">17 · Your inputs</div>
+        <h2>Decisions only you can make</h2>
+        <p class="lede">These are practical constraints. They do not need the professor, but they change the plan.</p>
+
+        <form id="decisionForm" autocomplete="off">
+
+        <div class="decisions">
+          <label class="field">
+            <span>Primary city / region for footage and 108 livery</span>
+            <select name="city">
+              <option value="">Choose one</option>
+              <option>Chennai</option>
+              <option>Bengaluru</option>
+              <option>Hyderabad</option>
+              <option>Kochi</option>
+              <option>Other South Indian city</option>
+              <option>Not decided yet</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Realistic hours per week</span>
+            <select name="hours">
+              <option value="">Choose one</option>
+              <option>Under 10 hours</option>
+              <option>10–15 hours</option>
+              <option>15–20 hours</option>
+              <option>20–25 hours</option>
+              <option>More than 25 hours</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Laptop GPU / RAM / free disk</span>
+            <input type="text" name="hardware" placeholder="e.g. GTX 1650 4 GB · 16 GB RAM · 40 GB free">
+          </label>
+          <label class="field">
+            <span>Dashboard appetite</span>
+            <select name="dashboard">
+              <option value="">Choose one</option>
+              <option>CLI + annotated video only</option>
+              <option>Simple live view</option>
+              <option>Full dashboard if time allows</option>
+              <option>Dashboard is important to me</option>
+            </select>
+          </label>
+          <label class="field">
+            <span>Report / review format</span>
+            <input type="text" name="report" placeholder="e.g. college template, IEEE format, review dates">
+          </label>
+        </div>
+
+        <div class="form-actions no-print">
+          <button class="btn btn-primary" type="button" id="saveDecisionsBtn">Save decisions</button>
+          <button class="btn btn-outline js-download" type="button">Download all answers (.txt)</button>
+          <button class="btn btn-outline js-copy" type="button">Copy all answers</button>
+          <button class="btn btn-outline" type="button" onclick="window.print()">Print / save PDF</button>
+          <button class="btn btn-danger" type="button" id="resetBtn">Reset answers</button>
+          <span class="saved save-status" id="decisionStatus" aria-live="polite"></span>
+        </div>
+        </form>
+
+        <details class="export-fallback no-print">
+          <summary>Download not starting? Show the text to copy</summary>
+          <p class="export-help">The text file is generated locally. If your browser blocks downloads, open this box, copy the text into a file and send that file.</p>
+          <textarea class="export-text" readonly rows="12" aria-label="Questions, answers and decisions as plain text"></textarea>
+          <div class="export-copy"><button class="btn btn-outline js-copy" type="button">Copy text</button></div>
+        </details>
+      </section>
+      <!-- ================= 18. HOW TO USE ================= -->
+      <section class="section" id="howto">
+        <div class="section-kicker">18 · Using this brief</div>
+        <h2>How to use this page</h2>
+        <div class="grid g2">
+          <div class="card">
+            <h3>If you have ten minutes</h3>
+            <ol class="list-tight">
+              <li>Read the one-minute version and the two diagrams.</li>
+              <li>Read “why not YOLO” and the four layers.</li>
+              <li>Skim the metrics table so the claims are clear.</li>
+              <li>Stop there. Do not start coding before Round 2 is answered.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>Before the professor meeting</h3>
+            <ol class="list-tight">
+              <li>Answer Q1–Q10 and the practical decisions.</li>
+              <li>Click “Download all answers (.txt)” and keep the text file; use “Copy all answers” if downloads are blocked.</li>
+              <li>Ask the questions in order; record exact wording.</li>
+              <li>Update the shared docs with any changed decision.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>After the meeting</h3>
+            <ol class="list-tight">
+              <li>Freeze the protocol and benchmark size.</li>
+              <li>Create the data manifest and repository skeleton.</li>
+              <li>Build the audio and vision baselines before fusion.</li>
+              <li>Keep the lead-time vs false-alarm curve as the headline.</li>
+            </ol>
+          </div>
+          <div class="card">
+            <h3>What “done” looks like</h3>
+            <ul class="check">
+              <li>A clean checkout runs one command and produces an annotated MP4 plus a JSON log.</li>
+              <li>Every reported number can be regenerated from a saved split.</li>
+              <li>Real and synthetic results are separate.</li>
+              <li>Failures are documented, not hidden.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= 19. GLOSSARY ================= -->
+      <section class="section" id="glossary">
+        <div class="section-kicker">19 · Plain-language glossary</div>
+        <h2>Terms used on this page</h2>
+        <div class="glossary">
+          <div class="term"><b>SirenFirst-108</b><span>The curated benchmark of South Indian 108 event clips, negatives and disclosed synthetic composites.</span></div>
+          <div class="term"><b>Preemption</b><span>Temporarily giving priority to one approach at a signal, while holding conflicting movements.</span></div>
+          <div class="term"><b>Arm</b><span>One of the four approaches to a junction: north, east, south or west. Not a painted lane.</span></div>
+          <div class="term"><b>Lead time</b><span>Seconds between the system's confirmed decision and the ambulance crossing the stop line.</span></div>
+          <div class="term"><b>False alarm per hour</b><span>How many times the system raises a confirmed alert in an hour of negative footage. Lower is better.</span></div>
+          <div class="term"><b>Homography</b><span>A one-time mapping from four points on the road to a flat bird's-eye view, so distances can be measured.</span></div>
+          <div class="term"><b>Bird's-eye view</b><span>A top-down rendering of the junction used to reason about arms and distance.</span></div>
+          <div class="term"><b>K-of-N</b><span>A smoothing rule: require K detections out of the last N windows before raising an alert.</span></div>
+          <div class="term"><b>Hysteresis</b><span>Using different thresholds to start and stop an alert, so it does not flicker.</span></div>
+          <div class="term"><b>FSM</b><span>Finite-state machine: the explicit set of signal states and allowed transitions.</span></div>
+          <div class="term"><b>All-red clearance</b><span>A short period where all conflicting movements are red before another direction gets green.</span></div>
+          <div class="term"><b>HOG + SVM</b><span>A classical image descriptor and classifier, trained from scratch on our crops.</span></div>
+          <div class="term"><b>Log-mel</b><span>A time-frequency representation of audio used as input to the siren model.</span></div>
+          <div class="term"><b>Synthetic composite</b><span>An ambulance crop pasted onto real junction footage. Always labelled and reported separately.</span></div>
+        </div>
+      </section>
+
+      <footer>
+        <p><b>SirenFirst planning brief.</b> Prepared 23 October 2026. This page describes an intended system; it reports no results and makes no accuracy claims. Provisional targets still require the professor's approval.</p>
+        <p>Companion documents: <a href="docs/PROJECT_CONTEXT.md">docs/PROJECT_CONTEXT.md</a> · <a href="docs/DATASETS.md">docs/DATASETS.md</a> · <a href="README.md">README.md</a> · <a href="AGENTS.md">AGENTS.md</a>. Dataset links are external and require internet; the page itself works offline.</p>
+        <p class="tiny">No pretrained weights. No YOLO. No OCR. Software prototype only. All footage and datasets must be cited and used within their licences.</p>
+      </footer>
+
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'sirenfirst-plan-v2';
+  var EXPORT_FILENAME = 'sirenfirst-round2-answers.txt';
+  var answerForm = document.getElementById('answerForm');
+  var decisionForm = document.getElementById('decisionForm');
+  var questions = Array.prototype.slice.call(document.querySelectorAll('fieldset.q'));
+  var saveTimers = {};
+
+  function setStatus(anchor, message) {
+    var section = anchor && anchor.closest ? anchor.closest('section') : null;
+    var el = section ? section.querySelector('.save-status') : null;
+    if (el) el.textContent = message;
+  }
+
+  function timeLabel(date) {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function collect() {
+    var data = { questions: {}, decisions: {}, savedAt: new Date().toISOString() };
+    questions.forEach(function (fs) {
+      var n = fs.getAttribute('data-q');
+      var answer = fs.querySelector('.qnote');
+      data.questions[n] = {
+        answer: answer ? answer.value.trim() : ''
+      };
+    });
+    Array.prototype.forEach.call(decisionForm.elements, function (el) {
+      if (el.name) data.decisions[el.name] = el.value;
+    });
+    return data;
+  }
+
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(collect()));
+    return new Date();
+  }
+
+  function cancelSaveTimers() {
+    Object.keys(saveTimers).forEach(function (key) {
+      window.clearTimeout(saveTimers[key]);
+      delete saveTimers[key];
+    });
+  }
+
+  function saveForm(form) {
+    cancelSaveTimers();
+    try {
+      var savedAt = persist();
+      setStatus(form, 'Saved in this browser at ' + timeLabel(savedAt) + '.');
+    } catch (err) {
+      setStatus(form, 'Browser storage is blocked. Use Download all answers (.txt) or Copy all answers.');
+    }
+  }
+
+  function scheduleSave(form) {
+    window.clearTimeout(saveTimers[form.id]);
+    saveTimers[form.id] = window.setTimeout(function () {
+      delete saveTimers[form.id];
+      saveForm(form);
+    }, 250);
+  }
+
+  function restore() {
+    var raw;
+    try {
+      raw = localStorage.getItem(STORAGE_KEY);
+    } catch (err) {
+      return;
+    }
+    if (!raw) return;
+    var data;
+    try {
+      data = JSON.parse(raw);
+    } catch (err) {
+      return;
+    }
+    var restoredAnswers = false;
+    var restoredDecisions = false;
+    Object.keys(data.questions || {}).forEach(function (n) {
+      var fs = questions.filter(function (q) { return q.getAttribute('data-q') === n; })[0];
+      if (!fs) return;
+      var saved = data.questions[n] || {};
+      var answer = fs.querySelector('.qnote');
+      if (answer && saved.answer) {
+        answer.value = saved.answer;
+        restoredAnswers = true;
+      }
+    });
+    Object.keys(data.decisions || {}).forEach(function (name) {
+      var el = decisionForm.elements.namedItem(name);
+      if (el && data.decisions[name]) {
+        el.value = data.decisions[name];
+        restoredDecisions = true;
+      }
+    });
+    if (restoredAnswers) setStatus(answerForm, 'Earlier answers restored from this browser.');
+    if (restoredDecisions) setStatus(decisionForm, 'Earlier decisions restored from this browser.');
+  }
+
+  function readableAnswer(fs) {
+    var answer = fs.querySelector('.qnote');
+    return answer && answer.value.trim() ? answer.value.trim() : '(unanswered)';
+  }
+
+  function buildText() {
+    var lines = [];
+    lines.push('SirenFirst — Round 2 questions, answers and decisions');
+    lines.push('Generated: ' + new Date().toLocaleString());
+    lines.push('');
+    lines.push('ROUND 2 QUESTIONS');
+    lines.push('-----------------');
+    questions.forEach(function (fs) {
+      var n = fs.getAttribute('data-q');
+      var legend = fs.querySelector('legend');
+      var text = legend ? legend.textContent.replace(/^Q\d+\s*/, '').trim() : ('Question ' + n);
+      lines.push('Q' + n + '. ' + text);
+      lines.push('Answer: ' + readableAnswer(fs));
+      lines.push('');
+    });
+    lines.push('DECISIONS');
+    lines.push('---------');
+    Array.prototype.forEach.call(decisionForm.elements, function (el) {
+      if (!el.name) return;
+      var field = el.closest('.field');
+      var label = field ? field.querySelector('span') : null;
+      lines.push((label ? label.textContent.trim() : el.name) + ': ' + (el.value || '(unanswered)'));
+    });
+    lines.push('');
+    lines.push('Generated from index.html. Answers are stored only in the browser unless downloaded or copied.');
+    return lines.join('\n');
+  }
+
+  function setExportText(text) {
+    Array.prototype.forEach.call(document.querySelectorAll('.export-text'), function (ta) {
+      ta.value = text;
+    });
+  }
+
+  function refreshOpenExports() {
+    if (document.querySelector('.export-fallback[open]')) setExportText(buildText());
+  }
+
+  function openFallback(button, text) {
+    var section = button && button.closest ? button.closest('section') : null;
+    var details = section ? section.querySelector('.export-fallback') : null;
+    setExportText(text);
+    if (!details) return;
+    details.open = true;
+    details.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    var ta = details.querySelector('.export-text');
+    if (ta) {
+      ta.focus();
+      ta.select();
+    }
+  }
+
+  function triggerBlobDownload(text) {
+    var blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
+      window.navigator.msSaveOrOpenBlob(blob, EXPORT_FILENAME);
+      return;
+    }
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = EXPORT_FILENAME;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    window.setTimeout(function () {
+      a.remove();
+      URL.revokeObjectURL(url);
+    }, 60000);
+  }
+
+  function downloadAll(button) {
+    cancelSaveTimers();
+    try { persist(); } catch (err) {}
+    var text = buildText();
+    setExportText(text);
+    setStatus(button, 'Preparing the text file…');
+    var fallback = function (message) {
+      triggerBlobDownload(text);
+      setStatus(button, message || 'Download requested. If no file appears, open “Download not starting? Show the text to copy” below.');
+    };
+    if (typeof window.showSaveFilePicker === 'function') {
+      var picker;
+      try {
+        picker = window.showSaveFilePicker({
+          suggestedName: EXPORT_FILENAME,
+          types: [{ description: 'Text file', accept: { 'text/plain': ['.txt'] } }]
+        });
+      } catch (err) {
+        fallback();
+        return;
+      }
+      picker.then(function (handle) {
+        return handle.createWritable().then(function (writable) {
+          return writable.write(text).then(function () {
+            return writable.close();
+          });
+        });
+      }).then(function () {
+        setStatus(button, 'File saved where you chose.');
+      }).catch(function (err) {
+        if (err && err.name === 'AbortError') {
+          setStatus(button, 'Save cancelled. Answers are still saved in this browser.');
+          return;
+        }
+        fallback();
+      });
+      return;
+    }
+    fallback();
+  }
+
+  function copyAll(button) {
+    cancelSaveTimers();
+    try { persist(); } catch (err) {}
+    var text = buildText();
+    setExportText(text);
+    var fallback = function () {
+      openFallback(button, text);
+      setStatus(button, 'Automatic copy was blocked. The text is selected—press Ctrl+C or long-press to copy.');
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        setStatus(button, 'All questions, answers and decisions copied.');
+      }).catch(fallback);
+      return;
+    }
+    fallback();
+  }
+
+  function reset() {
+    if (!window.confirm('Clear all answers and decisions saved in this browser?')) return;
+    cancelSaveTimers();
+    try { localStorage.removeItem(STORAGE_KEY); } catch (err) {}
+    answerForm.reset();
+    decisionForm.reset();
+    setExportText('');
+    setStatus(answerForm, 'All answers and decisions cleared.');
+    setStatus(decisionForm, 'All answers and decisions cleared.');
+  }
+
+  [answerForm, decisionForm].forEach(function (form) {
+    form.addEventListener('input', function () {
+      scheduleSave(form);
+      refreshOpenExports();
+    });
+    form.addEventListener('change', function () {
+      scheduleSave(form);
+      refreshOpenExports();
+    });
+    form.addEventListener('submit', function (e) { e.preventDefault(); });
+  });
+
+  document.getElementById('saveAnswersBtn').addEventListener('click', function () {
+    saveForm(answerForm);
+  });
+  document.getElementById('saveDecisionsBtn').addEventListener('click', function () {
+    saveForm(decisionForm);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.js-download'), function (button) {
+    button.addEventListener('click', function () { downloadAll(button); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.js-copy'), function (button) {
+    button.addEventListener('click', function () { copyAll(button); });
+  });
+  document.getElementById('resetBtn').addEventListener('click', reset);
+  Array.prototype.forEach.call(document.querySelectorAll('.export-fallback'), function (details) {
+    details.addEventListener('toggle', function () {
+      if (details.open) setExportText(buildText());
+    });
+  });
+
+  var bar = document.querySelector('.scroll-progress span');
+  function updateProgress() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - doc.clientHeight;
+    var pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.toc a'));
+  var linkById = {};
+  tocLinks.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    if (id) linkById[id] = a;
+  });
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        tocLinks.forEach(function (a) { a.classList.remove('active'); });
+        var link = linkById[entry.target.id];
+        if (link) link.classList.add('active');
+      });
+    }, { rootMargin: '-12% 0px -70% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (section) {
+      observer.observe(section);
+    });
+  }
+
+  var openedForPrint = [];
+  var printTextareas = [];
+  window.addEventListener('beforeprint', function () {
+    openedForPrint = [];
+    document.querySelectorAll('details').forEach(function (d) {
+      if (!d.open) { d.open = true; openedForPrint.push(d); }
+    });
+    printTextareas = [];
+    Array.prototype.forEach.call(document.querySelectorAll('.qnote'), function (ta) {
+      printTextareas.push({ el: ta, height: ta.style.height, overflow: ta.style.overflow });
+      ta.style.height = (ta.scrollHeight + 4) + 'px';
+      ta.style.overflow = 'hidden';
+    });
+  });
+  window.addEventListener('afterprint', function () {
+    openedForPrint.forEach(function (d) { d.open = false; });
+    openedForPrint = [];
+    printTextareas.forEach(function (item) {
+      item.el.style.height = item.height;
+      item.el.style.overflow = item.overflow;
+    });
+    printTextareas = [];
+  });
+
+  restore();
+})();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
